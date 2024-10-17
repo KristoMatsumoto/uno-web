@@ -10,22 +10,44 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_10_10_202823) do
+ActiveRecord::Schema[7.1].define(version: 2024_10_13_102121) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "guests", force: :cascade do |t|
-    t.string "nickname"
-    t.string "session_token"
+    t.string "nickname", null: false
+    t.string "session_token", null: false
+    t.datetime "last_seen_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["session_token"], name: "index_guests_on_session_token", unique: true
+  end
+
+  create_table "room_players", force: :cascade do |t|
+    t.bigint "room_id", null: false
+    t.string "player_type", null: false
+    t.bigint "player_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["player_id", "room_id"], name: "index_room_players_on_player_id_and_room_id"
+    t.index ["player_type", "player_id"], name: "index_room_players_on_player"
+    t.index ["room_id"], name: "index_room_players_on_room_id"
+  end
+
+  create_table "rooms", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_rooms_on_code", unique: true
   end
 
   create_table "users", force: :cascade do |t|
     t.string "login"
     t.string "password_digest"
+    t.string "nickname", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "room_players", "rooms"
 end

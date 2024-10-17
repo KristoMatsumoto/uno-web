@@ -1,0 +1,30 @@
+@import 'style';
+
+%background_with_image {
+    background-color: $background;
+    background-image: image-url('background_template.svg');
+    background-repeat: repeat;
+}
+%buttons {
+    display: block;
+    border-width: 0;
+    border-style: none;
+    text-align: center;
+}
+
+// CONTAINERS
+%center-one-container{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+%flex-container{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+// %center-container{
+//     margin: 0 auto;
+//     width: fit-content;
+// }

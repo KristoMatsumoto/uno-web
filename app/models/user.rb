@@ -1,9 +1,28 @@
 class User < ApplicationRecord
+  include Nickname
+
+  has_many :room_players, as: :player
+  has_many :rooms, through: :room_players
+  
   attr_accessor :old_password
   has_secure_password validations: false
 
-  before_validation :downcase_login
+  validates :login, presence: true
+  validate :login_complexity, if: -> { login.present? }
+  validates :login, uniqueness: true, if: -> { login.present? }
+  validates :password, confirmation: true, allow_blank: true, length: { minimum: 8, maximum: 32 }
+  validate :password_complexity, if: -> { password.present? }
+  validate :password_presence
+  validate :correct_old_password, on: :update, if: -> { password.present? || login_changed? }
   
+  before_validation :downcase_login
+  before_save :set_valid_nickname
+
+  def initialize(attributes = {})
+    super
+    self.nickname ||= "Player_#{SecureRandom.hex(4)}"
+  end
+
   private 
 
   def downcase_login

@@ -1,0 +1,49 @@
+<div class='form-page'>
+    <div class='form-background'><div class='form-container'>
+        <div class='main-label'>JOIN ROOM</div>
+
+        <%= form_with model: @room_player, url: rooms_join_path, method: :post, id: 'join-room-form', html: { style: params.dig(:room_player, :submit_type) == 'create' ? 'display: none;' : '' } do | form | %>
+            <%= form.hidden_field :submit_type, value: 'join'%>
+            <div>
+                <%= form.label "Nickname" %>
+                <%= form.text_field :nickname, placeholder: 'Enter nickname', value: @player&.nickname %>
+            </div>
+            <div class='<% if (flash[:error] || flash[:warning]) %>error<% end %>'>
+                <%= form.label "Room code" %>
+                <div class='pare-container'>
+                    <%= form.text_field :code, placeholder: 'Code' %>
+                    <%= form.submit 'PLAY', class: 'play-button' %>
+                </div>
+                
+                <p class='message'><%= flash[:error] %></p><p class='message'><%= flash[:warning] %></p>
+            </div>
+            <button type='button' class='selection-option', id="create-room-button">CREATE NEW ROOM</button>
+        <% end %>
+
+        <%= form_with model: @room_player, url: rooms_path, method: :post, id: 'create-room-form', html: { style: params.dig(:room_player, :submit_type) == 'create' ? '' : 'display: none;' } do | form | %>
+            <%= form.hidden_field :submit_type, value: 'create' %>
+            <div>
+                <%= form.label "Nickname"%>
+                <%= form.text_field :nickname, placeholder: 'Enter nickname', value: @player&.nickname %>
+                <p class='message'><%= flash[:error] %></p><p class='message'><%= flash[:warning] %></p>
+            </div>
+            <div class='<% if (flash[:error] || flash[:warning]) %>error<% end %>'>
+
+                <div class='pare-container'>
+                    <%= form.submit 'PLAY', class: 'play-button' %>
+                </div>
+                
+            </div>
+            <button type='button' class='selection-option', id="join-room-button">JOIN OTHER ROOM</button>
+        <% end %>
+
+        <%= javascript_include_tag "new_room_form", async: true %>
+        <hr>
+        <% if user_signed_in? %>
+            <%= button_to new_user_path, class: "selection-option" do %>Log out<% end %>
+        <% else %>
+            <%= button_to new_user_path, class: "selection-option" do %>Log in<% end %>
+            <%= button_to new_user_path, class: "selection-option" do %>Create account <% end %>
+        <% end %>
+    </div></div>
+</div>

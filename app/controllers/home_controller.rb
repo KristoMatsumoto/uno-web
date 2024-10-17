@@ -3,9 +3,11 @@ class HomeController < ApplicationController
 
   def index
   end
-  
+
   def login
-    @user = User.new
-    @guest = Guest.new
+    # @user = User.new
+    # @guest = current_guest || Guest.new
+
+    # @guests = Guest.all
   end
 end

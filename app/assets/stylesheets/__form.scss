@@ -1,0 +1,214 @@
+@import 'partials';
+@import 'style';
+
+%form-borders {
+    border-color: $form-color;
+    border-width: 5px;
+    border-style: solid;
+}
+
+
+
+.form-background {
+    background-color: $form-background;
+    padding: 10px;
+    border-radius: 25px;
+}
+.form-container {
+    padding: 20px 20px 0;
+    @extend %form-borders;
+    border-radius: 20px;
+    color: $form-color;
+
+    *{
+        border-radius: 10px;
+    }
+    > *,
+    > form > * {
+        margin-bottom: 20px;
+    }
+    form {
+        margin: 0;
+    }
+    hr {
+        @extend %form-borders;
+        border-width: 2.5px;
+    }
+    .main-label{
+        font-size: 3rem;
+    }
+    label{
+        display: block;
+        font-size: 1.5rem;
+    }
+    input, button{
+        padding: 5px;
+        outline: none;
+        border-style: solid;
+    }
+    input:not([type="submit" i]){
+        font-size: 2rem;
+        background-color: $input-background;
+        border: solid 5px $input-background;        
+    }
+    input:not([type="submit" i]):hover{
+        background-color: $form-background;
+        border-color: $input-background;
+    }
+    input:not([type="submit" i]):focus{
+        background-color: $input-background;
+        border-color: $input-border;
+    }
+    .error input:not([type="submit" i]){
+        background-image: image-url('warning.svg');
+        background-repeat: no-repeat;
+        background-size: 3rem;
+        background-position: right center;
+        border-color: $error !important;
+    }
+    .message{
+        margin: 5px 0 0;
+        color: $error;
+    }
+
+    .selection-option{
+        border-width: 5px;
+        width: calc(100% - 20px);
+        font-size: 2rem;
+        background-color: $form-background;
+        color: $form-color;
+        text-align: center;
+        border-color: $form-background;
+    }
+    .selection-option:hover{
+        background-color: $form-background;
+        border-color: $input-background;
+    }
+    .selection-option:active{
+        background-color: $input-background;
+        border-color: $input-background;
+    }
+    .pare-container input:not([type="submit" i]){
+        // max-width: 5rem;
+        width: 5rem;
+    }
+
+}
+.play-button{
+    text-align: center;
+    border-radius: 10px;
+    font-size: 2rem;
+    background-color: $button-success !important;
+    border: solid 5px $button-success !important;
+    color: $button-success-color !important;
+}
+.play-button:hover{
+    background-color: $button-success !important;
+    border-color: $button-success-border !important;
+    color: $button-success-border !important;
+}
+.play-button:active{
+    background-color: $button-success-color !important;
+    border-color: $button-success !important;
+    color: $button-success !important;
+}
+// @import 'mixins';
+
+// %form-element{
+//     display: block;
+//     border-radius: 10px;
+//     margin: 5px;
+// }
+
+// form{
+//     min-width: 300px;
+// }
+// .form-container{
+//     width: max-content;
+//     margin: 10px auto;
+//     padding: 15px;
+//     border-radius: 10px;
+//     background: $form-background;
+//     color: $form-color;
+// }
+// .form-container{
+//     hr {
+//         border-style: solid;
+//         border-color: $form-elements;
+//         border-width: 1px;
+//     }
+    
+//     .form-element{ @extend %form-element; }
+//     .selected-element{
+//         @extend %form-element;
+//         background: $form-elements;
+//         padding: 10px;
+//     }
+
+//     .selection-options{
+//         @extend %form-element;        
+//         @include hover-animate(medium);
+//         height: 20px;
+//         padding: 10px;
+//     }
+//     .selection-options:hover{
+//         background: linear-gradient(0.25turn, #0000 50%, $form-elements);
+//         @include hover-animate(large);
+//     }
+
+//     input{
+//         margin: 5px 0;
+        
+//     }
+//     input:not([type="submit" i]){
+//         width: calc(100% - 20px);
+//         display: block;
+//         background-color: $input-background;
+//         color: $input-color;
+//         padding: 5px 10px;
+//         border-style: solid;
+//         border-radius: 5px;
+//         border-width: 3px;
+//         border-color: #0000;
+//         font-size: x-large;
+//     }
+//     input:not([type="submit" i]):active, input:not([type="submit" i]):focus{
+//         outline: none;
+//     }
+//     .error{
+//         input{ border-color: $error; }
+//         .message{ color: $error; }
+//     }
+//     .warning{
+//         input{ border-color: $warning; }
+//         .message{ color: $warning; }
+//     }
+    
+// }
+// .add-room-button.selection-options{
+//     @extend %buttons;
+//     width: calc(100% - 20px);
+//     margin: 0;
+//     background-color: $form-background;
+//     color: $form-color;
+// }
+// .play-button{
+//     display: block;
+//     color: $button-success-color;
+//     background: $button-success;
+//     padding: 5px;
+//     text-align: center;
+//     font-size: 2rem;
+//     font-weight: 600;
+//     border-radius: 5px;
+//     width: 125px;
+//     border: none;
+//     margin: 5px;
+// }
+// .play-button:hover{
+//     background: radial-gradient(circle, $button-success 50%, $button-success-hover 100%);
+//     color: $button-success-color-hover;
+//     // border-color: $button-success-hover;
+// }
+
+

@@ -1,6 +1,9 @@
 class UsersController < ApplicationController
   before_action :check_no_authenticate, only: [:create]
 
+  def new
+        
+  end
   def create
     @user = User.new user_params
 
@@ -10,7 +13,7 @@ class UsersController < ApplicationController
       # redirect_to edit_user_path
     else
       flash[:error] = "Unable to save"
-      # render :new, status: :unprocessable_entity
+      render 'home/login', status: :unprocessable_entity
     end
   end
   
