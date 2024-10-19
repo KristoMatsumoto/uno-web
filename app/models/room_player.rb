@@ -11,7 +11,6 @@ class RoomPlayer < ApplicationRecord
   private 
 
   def set_player_number
-    self.player_num = self.room.room_players.count
-    # Добавлять не просто по количеству, а и учитывать пропуски (вышедшие игроки)
+    self.player_num = self.room.get_next_player_num
   end
 end

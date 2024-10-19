@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  include Nickname
+  include Player
 
   has_one :room_player, as: :player
   has_many :rooms, through: :room_players

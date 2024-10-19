@@ -1,7 +1,9 @@
 class RoomsController < ApplicationController  
+  skip_before_action :verify_authenticity_token, only: [:leave]
   before_action :set_player, only: [:new, :create, :join, :show]
   before_action :set_player_nickname, only: [:create, :join]
   before_action :is_player_in_room, only: [:show]
+  before_action :set_code_uppercase, only: [:join]
 
   def new
     @room ||= Room.new
@@ -12,7 +14,8 @@ class RoomsController < ApplicationController
     @room = Room.new
     @room.room_players.build(player: @player, is_admin: true)
     @room_player = @room.room_players.where(player: @player)
-    
+    @player.leave_room
+
     if @room.save
       redirect_to @room 
     else
@@ -29,6 +32,7 @@ class RoomsController < ApplicationController
   def join
     @room ||= Room.find_by(code: params.dig(:room_player, :code))
     @room_player = RoomPlayer.new(player: @player, room: @room)
+    @player.leave_room
     if (@room)
       if (@room.room_players.create(player: @player))
         redirect_to @room  
@@ -40,6 +44,17 @@ class RoomsController < ApplicationController
       flash[:error] = "Room not found, please check the code again"
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def leave
+    room = Room.find(params[:room_id])
+    player = room.room_players.find_by(player_num: params[:player_num])
+    if player
+      player.destroy
+      render json: { message: 'Player removed from room' }, status: :ok
+    else
+      render json: { error: 'Player not found' }, status: :not_found
+    end    
   end
 
   private
@@ -68,6 +83,12 @@ class RoomsController < ApplicationController
   end
 
   def is_player_in_room
-    # Перенаправление на :new если пользователь не в комнате
+    return if @player.room_player&.room_id == params[:id].to_i
+    redirect_to new_room_path
+  end
+
+  def set_code_uppercase
+    params.dig(:room_player, :code).upcase!
+    params.dig(:room_player, :code).gsub!(" ", "")
   end
 end

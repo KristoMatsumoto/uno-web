@@ -8,4 +8,5 @@ Rails.application.routes.draw do
 
   resources :rooms, only: [:new, :create, :show]
   post '/rooms/join', to: 'rooms#join', as: 'rooms_join'
+  delete '/rooms/:room_id/leave/:player_num', to: 'rooms#leave', as: 'rooms_leave'
 end
