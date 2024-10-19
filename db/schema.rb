@@ -27,9 +27,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_13_102121) do
     t.bigint "room_id", null: false
     t.string "player_type", null: false
     t.bigint "player_id", null: false
+    t.integer "player_num", null: false
+    t.boolean "is_admin", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["player_id", "room_id"], name: "index_room_players_on_player_id_and_room_id"
+    t.index ["player_num"], name: "index_room_players_on_player_num", unique: true
     t.index ["player_type", "player_id"], name: "index_room_players_on_player"
     t.index ["room_id"], name: "index_room_players_on_room_id"
   end

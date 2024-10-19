@@ -1,15 +1,27 @@
-<div class='room-code'>
-    <%= @room.code %>
-</div>
-<div class="room-container">
-    <div id="players">
-        <div class="player-info"></div>
-        <div class="player-info"></div>
-        <div class="player-info"></div>
-    </div>
-    <div class="settings">
+<div class='form-page' data-room-id="<%= @room.id %>" data-user-name="<%= @player.nickname %>" data-user-num="<%= @player.room_player.player_num %>">
+    <div class='form-background'><div class='room-container'>
+        
+        <div class="">
+            <div id="players">
+                <% @room_players.each do | player | %>
+                    <% if (player.player_num != @player.room_player.player_num) %>
+                    <div class="player-info" data-player-num='<%= player.player_num %>'><%= player.player.nickname %></div>
+                    <% end %>
+                <% end %>
+            </div>
+            <div class="settings">
 
-    </div>
+            </div>
+        </div>
+        <div class='room-code'>
+            <%= @room.code %>
+        </div>
+
+    </div></div>
 </div>
 
-<%= Guest.all.inspect %>
+
+
+
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<%= javascript_include_tag "room_socket", 'data-turbo-track': 'reload' %>

@@ -36,8 +36,6 @@
             </div>
             <button type='button' class='selection-option', id="join-room-button">JOIN OTHER ROOM</button>
         <% end %>
-
-        <%= javascript_include_tag "new_room_form", async: true %>
         <hr>
         <% if user_signed_in? %>
             <%= button_to new_user_path, class: "selection-option" do %>Log out<% end %>
@@ -47,3 +45,5 @@
         <% end %>
     </div></div>
 </div>
+
+<%= javascript_include_tag "new_room_form", 'data-turbo-track': 'reload' %>

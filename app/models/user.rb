@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   include Nickname
 
-  has_many :room_players, as: :player
+  has_one :room_player, as: :player
   has_many :rooms, through: :room_players
   
   attr_accessor :old_password

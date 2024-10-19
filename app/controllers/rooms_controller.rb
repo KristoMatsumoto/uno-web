@@ -1,5 +1,5 @@
 class RoomsController < ApplicationController  
-  before_action :set_player, only: [:new, :create, :join]
+  before_action :set_player, only: [:new, :create, :join, :show]
   before_action :set_player_nickname, only: [:create, :join]
   before_action :is_player_in_room, only: [:show]
 
@@ -10,10 +10,9 @@ class RoomsController < ApplicationController
 
   def create
     @room = Room.new
-    @room.room_players.build(player: @player)
+    @room.room_players.build(player: @player, is_admin: true)
     @room_player = @room.room_players.where(player: @player)
     
-    RoomPlayer.delete_player_from_all(@player)
     if @room.save
       redirect_to @room 
     else
@@ -24,13 +23,13 @@ class RoomsController < ApplicationController
 
   def show
     @room ||= Room.find(params[:id])
+    @room_players = @room.room_players
   end
 
   def join
     @room ||= Room.find_by(code: params.dig(:room_player, :code))
     @room_player = RoomPlayer.new(player: @player, room: @room)
     if (@room)
-      RoomPlayer.delete_player_from_all(@player)
       if (@room.room_players.create(player: @player))
         redirect_to @room  
       else 
@@ -59,7 +58,7 @@ class RoomsController < ApplicationController
   def set_player_nickname
     return if params.dig(:room_player, :nickname).nil?
     return if @player.nickname == params.dig(:room_player, :nickname)
-    puts "===\n\nUPDATE\n\n==="
+    
     args = {}
     args[:nickname] = params.dig(:room_player, :nickname)
     return if @player.update args
