@@ -1,27 +1,39 @@
 <div class='form-page' data-room-id="<%= @room.id %>" data-user-name="<%= @player.nickname %>" data-user-num="<%= @player.room_player.player_num %>">
     <div class='form-background'><div class='room-container'>
-        
-        <div class="">
-            <div id="players">
-                <% @room_players.each do | player | %>
-                    <% if (player.player_num != @player.room_player.player_num) %>
-                    <div class="player-info" data-player-num='<%= player.player_num %>'><%= player.player.nickname %></div>
-                    <% end %>
+        <div id="players">
+            <% @room_players.each do | player | %>
+                    <div class="player-info" data-player-num='<%= player.player_num %>'>
+                        <div class='avatar'>
+                            <%= image_tag 'avatar_icon.svg' %>
+                        </div>
+                        <div class='nickname'><%= player.player.nickname %></div>
+                        <button class='little-button get-admin'></button>
+                        <button class='little-button remove-from-room'></button>
+                    </div>
+            <% end %>
+        </div>
+
+        <div>
+            <div class='room-info'>
+                <div class='main-label'><%= @room.code %></div>
+                <div class='show-code'></div>
+            </div>
+            <div class="settings-block">
+                
+            </div>
+            <div>
+                <%= button_to new_room_path, method: :get, class: 'dangerous-button' do %>
+                    LEAVE ROOM
                 <% end %>
-            </div>
-            <div class="settings">
-
+                <button id='start-game' class='play-button'>Start</button>
             </div>
         </div>
-        <div class='room-code'>
-            <%= @room.code %>
-        </div>
-
     </div></div>
 </div>
 
-
-
-
+<%# if @room.game_start? отрисовать холст %>
 <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<%= javascript_include_tag "game_draw", 'data-turbo-track': 'reload' %>
 <%= javascript_include_tag "room_socket", 'data-turbo-track': 'reload' %>
+<%= javascript_include_tag "play_socket", 'data-turbo-track': 'reload' %>
+

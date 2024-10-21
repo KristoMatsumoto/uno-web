@@ -12,17 +12,58 @@
     text-align: center;
 }
 
+// FORM STYLE
+%form-borders {
+    border-color: $form-color;
+    border-width: 5px;
+    border-style: solid;
+}
+%doubled-container-back{
+    background-color: $form-background;
+    padding: 10px;
+    border-radius: 25px;
+}
+%doubled-container-front{
+    @extend %form-borders;
+    border-radius: 20px;
+    color: $form-color;
+}
+
 // CONTAINERS
-%center-one-container{
+%center-one-container {
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
-%flex-container{
+%flex-container {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
     padding: 10px;
+}
+%flex-container-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    padding: 10px;
+
+    > *{
+        margin-right: 10px;
+    }
+    > *:nth-last-of-type(1){
+        margin-right: 0;
+    }
+}
+%pare-container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-items: stretch;
+
+    > * {
+        flex: 1 1 auto;
+    }
 }
 // %center-container{
 //     margin: 0 auto;

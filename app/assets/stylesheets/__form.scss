@@ -1,24 +1,13 @@
 @import 'partials';
 @import 'style';
-
-%form-borders {
-    border-color: $form-color;
-    border-width: 5px;
-    border-style: solid;
-}
-
-
+@import 'mixins';
 
 .form-background {
-    background-color: $form-background;
-    padding: 10px;
-    border-radius: 25px;
+    @extend %doubled-container-back;
 }
 .form-container {
     padding: 20px 20px 0;
-    @extend %form-borders;
-    border-radius: 20px;
-    color: $form-color;
+    @extend %doubled-container-front;
 
     *{
         border-radius: 10px;
@@ -32,10 +21,7 @@
     }
     hr {
         @extend %form-borders;
-        border-width: 2.5px;
-    }
-    .main-label{
-        font-size: 3rem;
+        border-width: 2.5px !important;
     }
     label{
         display: block;
@@ -94,121 +80,31 @@
     }
 
 }
+
+@media only screen and (max-width: 500px){
+    .form-background{
+        margin: 0;
+        padding: 0;
+    }
+    .form-container{
+        border-width: 0 !important;
+    }
+}
 .play-button{
-    text-align: center;
-    border-radius: 10px;
-    font-size: 2rem;
-    background-color: $button-success !important;
-    border: solid 5px $button-success !important;
-    color: $button-success-color !important;
+    @include big-button($button-success);
 }
 .play-button:hover{
-    background-color: $button-success !important;
-    border-color: $button-success-border !important;
-    color: $button-success-border !important;
+    @include big-button--hover($button-success);
 }
 .play-button:active{
-    background-color: $button-success-color !important;
-    border-color: $button-success !important;
-    color: $button-success !important;
+    @include big-button--active($button-success);
 }
-// @import 'mixins';
-
-// %form-element{
-//     display: block;
-//     border-radius: 10px;
-//     margin: 5px;
-// }
-
-// form{
-//     min-width: 300px;
-// }
-// .form-container{
-//     width: max-content;
-//     margin: 10px auto;
-//     padding: 15px;
-//     border-radius: 10px;
-//     background: $form-background;
-//     color: $form-color;
-// }
-// .form-container{
-//     hr {
-//         border-style: solid;
-//         border-color: $form-elements;
-//         border-width: 1px;
-//     }
-    
-//     .form-element{ @extend %form-element; }
-//     .selected-element{
-//         @extend %form-element;
-//         background: $form-elements;
-//         padding: 10px;
-//     }
-
-//     .selection-options{
-//         @extend %form-element;        
-//         @include hover-animate(medium);
-//         height: 20px;
-//         padding: 10px;
-//     }
-//     .selection-options:hover{
-//         background: linear-gradient(0.25turn, #0000 50%, $form-elements);
-//         @include hover-animate(large);
-//     }
-
-//     input{
-//         margin: 5px 0;
-        
-//     }
-//     input:not([type="submit" i]){
-//         width: calc(100% - 20px);
-//         display: block;
-//         background-color: $input-background;
-//         color: $input-color;
-//         padding: 5px 10px;
-//         border-style: solid;
-//         border-radius: 5px;
-//         border-width: 3px;
-//         border-color: #0000;
-//         font-size: x-large;
-//     }
-//     input:not([type="submit" i]):active, input:not([type="submit" i]):focus{
-//         outline: none;
-//     }
-//     .error{
-//         input{ border-color: $error; }
-//         .message{ color: $error; }
-//     }
-//     .warning{
-//         input{ border-color: $warning; }
-//         .message{ color: $warning; }
-//     }
-    
-// }
-// .add-room-button.selection-options{
-//     @extend %buttons;
-//     width: calc(100% - 20px);
-//     margin: 0;
-//     background-color: $form-background;
-//     color: $form-color;
-// }
-// .play-button{
-//     display: block;
-//     color: $button-success-color;
-//     background: $button-success;
-//     padding: 5px;
-//     text-align: center;
-//     font-size: 2rem;
-//     font-weight: 600;
-//     border-radius: 5px;
-//     width: 125px;
-//     border: none;
-//     margin: 5px;
-// }
-// .play-button:hover{
-//     background: radial-gradient(circle, $button-success 50%, $button-success-hover 100%);
-//     color: $button-success-color-hover;
-//     // border-color: $button-success-hover;
-// }
-
-
+.dangerous-button{
+    @include big-button($button-dangerous);
+}
+.dangerous-button:hover{
+    @include big-button--hover($button-dangerous);
+}
+.dangerous-button:active{
+    @include big-button--active($button-dangerous);
+}

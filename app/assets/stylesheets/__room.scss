@@ -1,0 +1,122 @@
+@import 'partials';
+@import 'style';
+@import 'mixins';
+
+.room-container {
+    padding: 0;
+    min-width: 450px;
+    @extend %doubled-container-front;
+    @extend %pare-container;
+
+    > :nth-of-type(1){
+        padding: 10px 10px 0;
+        border-top: none;
+        border-right: solid 5px $form-color;
+    }
+    > :nth-of-type(2){
+        // padding: 10px;
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        // justify-content: stretch;
+        // align-items: stretch;
+        > .settings-block {
+            flex: 1 1 auto;
+            background: $container;
+            // border: solid 5px $container-blocks-color;
+        }
+    }
+    .player-info {
+        @extend %flex-container-row;
+        margin-bottom: 10px;
+        background-color: $input-background;
+        border-radius: 10px;
+        padding: 20px 10px;
+        min-width: min-content;
+
+        > *{
+            flex: 0 0 auto;
+        }
+        > .nickname{
+            flex: 1 1 auto;
+        }
+    }
+    #players{
+        flex: 1 2 100px;
+        min-height: 500px;
+        min-width: min-content;
+        // width: 40vw;
+    }
+    .main-label{
+        background: #fff;
+        text-align: center;
+        border-radius: 10px;
+        margin: 5px;
+        border: solid 3px $container;
+    }
+    .room-info{
+        @extend %pare-container;
+    }
+}
+.avatar, .avatar > *{
+    @include circle(70px);
+}
+.little-button{
+    @extend %buttons;
+    @extend %center-one-container;
+    @include circle(40px);
+    background: none;
+    border: solid 5px #0000;
+    * {
+        @include circle(30px);
+    }
+    // svg > *{
+    //     fill: $form-color;
+    // }
+    // :hover svg *{
+    //     fill: $form-background;
+    //     stoke: $form-background;
+    // }
+}
+.little-button:hover{
+    background-color: $input-border;
+}
+.little-button:active{
+    background-color: $button-color;
+    border-color: $button-color;
+}
+.little-button.get-admin{
+    background-image: image-url('room_admin_icon.png');
+    background-size: 30px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.little-button.remove-from-room{
+    background-image: image-url('delete_player_icon.png');
+    background-size: 30px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+@media only screen and (max-width: 500px) {
+    .room-container{
+        flex-direction: column-reverse;
+        border: none;
+        min-width: 90vw;
+
+        > :nth-of-type(1){
+            border-top: solid 5px $form-color;
+            border-right: none;
+        }
+        .avatar, .avatar > *{
+            @include circle(35px);
+        }
+    }
+    .little-button {
+        @include circle(25px);
+
+        * {
+            @include circle(20px);
+        }
+    }
+}

@@ -1,15 +1,21 @@
+// ----- COLORS -----
+$error: #FF4646;
+
 $button-success: #4BAD37;
-$button-success-border: #404045;
-$button-success-color: #E1E1E1;
+$button-dangerous: #FF4646;
+$button-border: #404045;
+$button-color: #E1E1E1;
 $background: #46464A;
 
 $container: #a24659;
 $container-blocks-color: #56325b;
 
 $form-background: #F0DB8C;
-$form-color: $button-success-border;
+$form-color: $button-border;
 $input-background: #DFC57C;
 $input-color: $form-color;
 $input-border: #D1B36E;
 
-$error: #FF4646;
+// ----- SIZES -----
+$font-size: 16px;
+$font-size-mini: 8px;

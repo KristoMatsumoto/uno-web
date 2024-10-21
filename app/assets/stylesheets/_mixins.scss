@@ -3,3 +3,28 @@
 //     transition-duration: 0.2s;
 //     transition-property: font-size;
 // }
+@mixin circle($size){
+    width: $size;
+    height: $size;
+    border-radius: $size;
+}
+@mixin big-button($main-color){
+    text-align: center;
+    border-radius: 10px;
+    font-size: 2rem;
+    border-style: solid;
+    border-width: 5px;
+    border-color: $main-color !important;
+    background-color: $main-color !important;
+    color: $button-color !important;
+}
+@mixin big-button--hover($main-color){
+    border-color: $button-border !important;
+    background-color: $main-color !important;
+    color: $button-border !important;
+}
+@mixin big-button--active($main-color){
+    border-color: $main-color !important;
+    background-color: $button-color !important;
+    color: $main-color !important;
+}
