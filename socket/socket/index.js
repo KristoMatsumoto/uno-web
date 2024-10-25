@@ -6,10 +6,10 @@ const players = [];
 function setupWebSocket(server){
     const io = new Server(server, {
         cors: {
-            origin: process.env.APP_PATH,
+            origin: "*",
             method: ["GET", "POST"]
         }
-    })
+    });
 
     io.on('connection', (socket) => {
         // roomChannel(io, socket);
@@ -22,6 +22,7 @@ function setupWebSocket(server){
                 players[data.room_id][data.player_number] = { 
                     id: socket.id,
                     nickname: socket.data.nickname,
+                    player_number: socket.data.player_number,
                     csrfToken: socket.data.csrfToken,
                     cookie: socket.data.cookie,
                     timer: null 
@@ -32,7 +33,7 @@ function setupWebSocket(server){
         })
     
         socket.on('disconnect', () => {
-            // console.log('A user disconnected');
+            // console.log(`A user ${socket.data.nickname} disconnected`);
             players[socket.data.room_id][socket.data.player_number].timer = setTimeout(() => {
                 socket.leave(socket.data.room_id);
                 // console.log(`Player ${socket.data.nickname} left room ${socket.data.room_id}`);
@@ -48,10 +49,10 @@ function setupWebSocket(server){
                 .then(async response => {
                     if (response.headers.get('content-type').includes('application/json')) {
                         const data = await response.json();
-                        console.log('Success:', data);
+                        // console.log('Success:', data);
                     } else {
                         const errorText = await response.text();
-                        console.error('Error:', errorText);  // Это может быть HTML-контент ошибки
+                        // console.error('Error:', errorText);
                     }
                 })
                 .then(data => {
@@ -71,8 +72,8 @@ function setupWebSocket(server){
                 players[data.room_id][data.player_number].id = socket.id;
                 // console.log(`User ${socket.data.nickname} (${socket.data.player_number}) reconnected to room ${socket.data.room_id}, timer cleared`);
             }
-        });
-    })
+        });        
+    });
 }
 
 module.exports = setupWebSocket;
