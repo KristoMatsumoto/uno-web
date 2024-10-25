@@ -11,7 +11,7 @@
             <div class='<% if (flash[:error] || flash[:warning]) %>error<% end %>'>
                 <%= form.label "Room code" %>
                 <div class='pare-container'>
-                    <%= form.text_field :code, placeholder: 'Code' %>
+                    <%= form.text_field :code, placeholder: 'Code', value: params.dig(:room_player, :code) %>
                     <%= form.submit 'PLAY', class: 'play-button' %>
                 </div>
                 

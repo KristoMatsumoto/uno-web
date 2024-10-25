@@ -1,6 +1,8 @@
 require('dotenv').config();
 const { Server } = require("socket.io");
+const Game = require("../models/Game");
 const players = [];
+const games = [];
 // const roomChannel = require('./room_channel');
 
 function setupWebSocket(server){
@@ -23,6 +25,7 @@ function setupWebSocket(server){
                     id: socket.id,
                     nickname: socket.data.nickname,
                     player_number: socket.data.player_number,
+                    is_admin: socket.data.is_admin,
                     csrfToken: socket.data.csrfToken,
                     cookie: socket.data.cookie,
                     timer: null 
@@ -72,7 +75,47 @@ function setupWebSocket(server){
                 players[data.room_id][data.player_number].id = socket.id;
                 // console.log(`User ${socket.data.nickname} (${socket.data.player_number}) reconnected to room ${socket.data.room_id}, timer cleared`);
             }
-        });        
+        });
+
+        socket.on('play_start', (data) => {
+            // отослать пинг всем игрокам?
+            // запрос к базе данных на смену статуса комнаты
+            fetch(`${process.env.APP_PATH}/rooms/${socket.data.room_id}/start`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': socket.data.csrfToken,
+                    'Cookie': socket.data.cookie
+                }
+            })
+            .then(async response => {
+                if (response.headers.get('content-type').includes('application/json')) {
+                    const data = await response.json();
+                    console.log('Success:', data);
+                } else {
+                    const errorText = await response.text();
+                    // console.error('Error:', errorText.slice(1, 300), "\n\n", errorText.slice(5000, 8000));
+                }
+            })
+            .then(ansdata => {
+                games[data.room_id] = new Game(data.settings, players[data.room_id]);
+                // for (let i = 0; i < players[data.room_id].length; i += 1){
+                //     if (players[i]){
+                //         console.log(i, ": ", players[i]);
+                //     }
+                // }
+                io.to(data.room_id).emit('game_start', {
+                    players: games[data.room_id].players,
+                    current_player: games[data.room_id].current_player,
+                    // room_id: data.room_id,
+                    rules: games[data.room_id].rules
+                });
+            })
+            .catch(error => {
+                // console.error('Error game starting:', error);
+                io.to(data.room_id).emit('game_start_error', error);
+            });
+        });
     });
 }
 

@@ -1,15 +1,17 @@
-<div class='form-page' data-room-id="<%= @room.id %>" data-user-name="<%= @player.nickname %>" data-user-num="<%= @player.room_player.player_num %>">
+<div class='form-page <% if @room.game_start? %>hidden<% end %>' id='room-form'
+data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-user-num='<%= @player.room_player.player_num %>' 
+<%= 'data-admin' if @player.room_player.is_admin %>/>
     <div class='form-background'><div class='room-container'>
-        <div id="players">
+        <div id='players'>
             <% @room_players.each do | player | %>
-                    <div class="player-info" data-player-num='<%= player.player_num %>'>
-                        <div class='avatar'>
-                            <%= image_tag 'avatar_icon.svg' %>
-                        </div>
-                        <div class='nickname'><%= player.player.nickname %></div>
-                        <button class='little-button get-admin'></button>
-                        <button class='little-button remove-from-room'></button>
+                <div class='player-info' data-player-num='<%= player.player_num %>'>
+                    <div class='avatar'>
+                        <%= image_tag 'avatar_icon.svg' %>
                     </div>
+                    <div class='nickname'><%= player.player.nickname %></div>
+                    <button class='little-button get-admin<% if !@player.room_player.is_admin? %> hidden<% end %>'></button>
+                    <button class='little-button remove-from-room<% if !@player.room_player.is_admin? %> hidden<% end %>'></button>
+                </div>
             <% end %>
         </div>
 
@@ -18,8 +20,10 @@
                 <div class='main-label'><%= @room.code %></div>
                 <div class='show-code'></div>
             </div>
-            <div class="settings-block">
-                
+            <div class='settings-block'>
+                <%= form_with do | form | %>
+
+                <% end %>
             </div>
             <div>
                 <%= button_to new_room_path, method: :get, class: 'dangerous-button' do %>
@@ -31,9 +35,17 @@
     </div></div>
 </div>
 
-<%# if @room.game_start? отрисовать холст %>
+<div class='form-page <% if !@room.game_start? %>hidden<% end %>' id='play-desk-block'>
+    <canvas id='play-desk'/>
+</div>
+
+<div class='hidden'>
+    <%= image_tag 'cards/0.svg' %>
+    <%# TEXTURES %>
+</div>
+
 <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<%= javascript_include_tag "UI", 'data-turbo-track': 'reload' %>
 <%= javascript_include_tag "game_draw", 'data-turbo-track': 'reload' %>
 <%= javascript_include_tag "room_socket", 'data-turbo-track': 'reload' %>
 <%= javascript_include_tag "play_socket", 'data-turbo-track': 'reload' %>
-

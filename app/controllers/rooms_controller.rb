@@ -1,5 +1,5 @@
 class RoomsController < ApplicationController  
-  skip_before_action :verify_authenticity_token, only: [:leave]
+  skip_before_action :verify_authenticity_token, only: [:leave, :start]
   before_action :set_player, only: [:new, :create, :join, :show]
   before_action :set_player_nickname, only: [:create, :join]
   before_action :is_player_in_room, only: [:show]
@@ -27,6 +27,7 @@ class RoomsController < ApplicationController
   def show
     @room ||= Room.find(params[:id])
     @room_players = @room.room_players
+    @settings ||= {}
   end
 
   def join
@@ -55,6 +56,16 @@ class RoomsController < ApplicationController
     else
       render json: { error: 'Player not found' }, status: :not_found
     end    
+  end
+
+  def start
+    room = Room.find(params[:id])
+    args = {:game_start => true}
+    if room.update args
+      render json: { message: 'Game in room #{params[:id]} started' }, status: :ok      
+    else 
+      render json: { error: 'Room not found' }, status: :not_found
+    end
   end
 
   private
