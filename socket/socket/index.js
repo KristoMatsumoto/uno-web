@@ -98,18 +98,13 @@ function setupWebSocket(server){
                 }
             })
             .then(ansdata => {
-                games[data.room_id] = new Game(data.settings, players[data.room_id]);
+                games[data.room_id] = new Game(data.room_id, data.settings, players[data.room_id]);
                 // for (let i = 0; i < players[data.room_id].length; i += 1){
                 //     if (players[i]){
                 //         console.log(i, ": ", players[i]);
                 //     }
                 // }
-                io.to(data.room_id).emit('game_start', {
-                    players: games[data.room_id].players,
-                    current_player: games[data.room_id].current_player,
-                    // room_id: data.room_id,
-                    rules: games[data.room_id].rules
-                });
+                io.to(data.room_id).emit('game_start', games[data.room_id].get_data());
             })
             .catch(error => {
                 // console.error('Error game starting:', error);

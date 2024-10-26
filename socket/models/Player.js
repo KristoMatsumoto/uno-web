@@ -1,13 +1,28 @@
+const Card = require('./Card');
+
 class Player {
-    constructor() {
+    constructor(data) {
+        this.nickname = data.nickname;
+        this.player_number = data.player_number;
+        // this.is_admin = data.is_admin;
 
+        this.cards = [];
     }
 
-    update() {
-
+    draw_card(card) {
+        this.cards.push(card);
+    }
+    draw_cards(cards) {
+        this.cards.push(...cards);
     }
 
-    draw() {
-
+    get_data() {
+        return {
+            nickname: this.nickname,
+            player_number: this.player_number,
+            // is_admin: this.is_admin
+        }
     }
 }
+
+module.exports = Player;
