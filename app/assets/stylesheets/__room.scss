@@ -4,7 +4,7 @@
 
 .room-container {
     padding: 0;
-    min-width: 450px;
+    min-width: 90vw;
     @extend %doubled-container-front;
     @extend %pare-container;
 
@@ -14,52 +14,70 @@
         border-right: solid 5px $form-color;
     }
     > :nth-of-type(2){
-        // padding: 10px;
         display: flex;
         flex-wrap: nowrap;
         flex-direction: column;
-        // justify-content: stretch;
-        // align-items: stretch;
+        
         > .settings-block {
             flex: 1 1 auto;
             background: $container;
-            // border: solid 5px $container-blocks-color;
         }
     }
-    .player-info {
-        @extend %flex-container-row;
+    .player-info-border{
+        display: flex;
+        justify-content: stretch;
+        padding: 7px;
         margin-bottom: 10px;
-        background-color: $input-background;
         border-radius: 10px;
-        padding: 20px 10px;
-        min-width: min-content;
+        background-color: $input-background;
 
-        > *{
-            flex: 0 0 auto;
-        }
-        > .nickname{
+        .player-info {
             flex: 1 1 auto;
+            @extend %flex-container-row;
+            background-color: $input-background;
+            border-radius: 5px;
+            padding: 10px 10px;
+    
+            > *{
+                flex: 0 0 auto;
+            }
+            > .nickname{
+                flex: 1 1 auto;
+            }
         }
+    }
+    .player-info-border:hover {
+        background-color: $button-color;
+    }
+    .player-info-border.youself{
+        background-color: $container;
     }
     #players{
-        flex: 1 2 100px;
+        flex: 0 1 auto;
         min-height: 500px;
-        min-width: min-content;
-        // width: 40vw;
+        min-width: calc(5vw + 20rem);
     }
-    .main-label{
-        background: #fff;
-        text-align: center;
-        border-radius: 10px;
-        margin: 5px;
-        border: solid 3px $container;
+    .avatar{
+        @include circle(70px);
+        border: solid 5px $avatar-background;
+        background-color: $avatar-background;
+    
+        > * {
+            @include circle(70px);
+        }
     }
     .room-info{
-        @extend %pare-container;
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: row;
+        gap: 10px;
+        padding: 10px;
+
+        * {
+            flex: 0 1 auto;
+            transition: flex-grow 1s ease;
+        }
     }
-}
-.avatar, .avatar > *{
-    @include circle(70px);
 }
 .little-button{
     @extend %buttons;
@@ -83,26 +101,57 @@
 }
 .little-button:active{
     background-color: $button-color;
-    border-color: $button-color;
 }
 .little-button.get-admin{
-    background-image: image-url('room_admin_icon.png');
-    background-size: 30px;
-    background-position: center;
-    background-repeat: no-repeat;
+    @include button-icon('room_admin_icon.png', 30px);
 }
 .little-button.remove-from-room{
-    background-image: image-url('delete_player_icon.png');
-    background-size: 30px;
-    background-position: center;
-    background-repeat: no-repeat;
+    @include button-icon('delete_player_icon.png', 30px);
+}
+.setting-button-block{
+    @extend %flex-container-row;
+    max-width: 250px;
+    border: solid 5px #0000;
+    background-color: $form-background;
+    border-radius: 20px;
+    
+    * {
+        display: none;
+    }
+    .setting-button{
+        display: inline-block;
+    }
+}
+.setting-button-block:hover {
+    flex-grow: 1;
+    // flex-basis: auto;
+    border-color: $input-background;
+    background-color: $form-background;
+    *{
+        display: inline-block;
+    }
+}
+.setting-button {
+    @extend %buttons;
+    @extend %center-one-container;
+    background-color: #0000;
+    width: 50px;
+    height: 50px;
+}
+.setting-button#copy-link {
+    @include button-icon('copy_link_icon.svg', 50px);
+}
+.setting-button#copy-code {
+    @include button-icon('copy_code_icon.svg', 50px);
+}
+.setting-button#hide-code {
+    @include button-icon('hide_code_icon.svg', 50px);
 }
 
 @media only screen and (max-width: 500px) {
     .room-container{
         flex-direction: column-reverse;
         border: none;
-        min-width: 90vw;
 
         > :nth-of-type(1){
             border-top: solid 5px $form-color;
@@ -119,4 +168,20 @@
             @include circle(20px);
         }
     }
+}
+
+#code{
+    @extend %center-one-container;
+    background: #fff;
+    text-align: center;
+    border-radius: 10px;
+    padding: 0 10px;
+    font-size: 3rem;
+    border: solid 3px $container;
+}
+
+canvas#play-desk{
+    width: 100%;
+    height: 100vh;
+    backdrop-filter: blur(5px);
 }

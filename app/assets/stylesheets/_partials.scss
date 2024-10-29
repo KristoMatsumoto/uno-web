@@ -35,6 +35,15 @@
     justify-content: space-around;
     align-items: center;
 }
+@media only screen and (max-width: 500px){
+    %center-one-container{
+        justify-content: stretch;
+        align-items: baseline;
+        > *{
+            flex: 1 1 auto;
+        }
+    }
+}
 %flex-container {
     display: flex;
     justify-content: space-around;

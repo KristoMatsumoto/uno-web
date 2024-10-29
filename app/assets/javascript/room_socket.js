@@ -36,16 +36,17 @@ function room_socket() {
         socket.on('room_join', (data) => {
             if (!players_list.querySelector(`[data-player-num="${data.player_number}"]`)){
                 const player_block = document.createElement('div');
-                player_block.className = 'player-info';
+                player_block.className = `player-info-border${data.player_number == window.socketData.player_number ? "youself" : ""}`;
                 player_block.setAttribute('data-player-num', data.player_number);
                 player_block.innerHTML = 
-                    `<div class='avatar'>
-                        <img src='/assets/avatar_icon.svg' alt='avatar icon'>
-                    </div>
-                    <div class='nickname'>${data.nickname}</div>
-                    <button class='little-button get-admin'></button>
-                    <button class='little-button remove-from-room'></button>`;
-                
+                    `<div class='player-info'>
+                        <div class='avatar'>
+                            <img src='/assets/avatar_icon.svg' alt='avatar icon'>
+                        </div>
+                        <div class='nickname'>${data.nickname}</div>
+                        <button class='little-button get-admin${window.socketData.is_admin ? "" : " hidden"}'></button>
+                        <button class='little-button remove-from-room${window.socketData.is_admin ? "" : " hidden"}'></button>
+                    </div>`;
                 players_list.appendChild(player_block);
             }
             // console.log('New player join the room', data.room_id, ': ', data.nickname, "\n", data);

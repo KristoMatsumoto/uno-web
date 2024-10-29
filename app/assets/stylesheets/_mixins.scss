@@ -28,3 +28,9 @@
     background-color: $button-color !important;
     color: $main-color !important;
 }
+@mixin button-icon($image-url, $size){
+    background-image: image-url($image-url);
+    background-size: $size;
+    background-position: center;
+    background-repeat: no-repeat;
+}
