@@ -1,8 +1,9 @@
-function player_socket(){
+player_socket = () => {
     const socket = window.websocket;
 
+    
     // Удаление игрока
     // Передача админки
 }
 
-player_socket()
+player_socket();

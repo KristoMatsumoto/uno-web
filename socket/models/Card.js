@@ -23,6 +23,12 @@ class Card {
                 this.color = null;
         }
     }
+
+    get_data() {
+        return {
+            value: this.value,
+        };
+    }
 }
 
 // Добавить проверку, что карты 1 и 2 группы всегда были с цветом, группы 3 - без

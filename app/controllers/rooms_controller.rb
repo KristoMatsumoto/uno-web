@@ -35,11 +35,16 @@ class RoomsController < ApplicationController
     @room_player = RoomPlayer.new(player: @player, room: @room)
     @player.leave_room
     if (@room)
-      if (@room.room_players.create(player: @player))
-        redirect_to @room  
-      else 
-        flash[:warning] = "Something get wrong. Try again"
+      if (@room.game_start? && @player.room_player.room != @room)
+        flash[:warning] = "There's already a game going on in this room"
         render :new, status: :unprocessable_entity
+      else 
+        if (@room.room_players.create(player: @player))
+          redirect_to @room  
+        else 
+          flash[:warning] = "Something get wrong. Try again"
+          render :new, status: :unprocessable_entity
+        end
       end
     else
       flash[:error] = "Room not found, please check the code again"

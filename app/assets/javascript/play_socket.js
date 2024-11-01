@@ -1,4 +1,4 @@
-function play_socket(){
+play_socket = () => {
     const play_button = document.querySelector('button#start-game');
     const socket = window.websocket;
     // const data = window.socketData;
@@ -13,27 +13,37 @@ function play_socket(){
             });
             this.disabled = true;
         }
-    })
+    });
 
     socket.on('game_start', (data) => {
-        // console.log("Signal start game confirm: ", data);
-        const room_block = document.getElementById('room-form');
-        const canvas_block = document.getElementById('play-desk-block');
-
-        room_block.classList.add('hidden');
-        canvas_block.classList.remove('hidden');
-        window.start_game(data); 
-        // добавить проверку при переподключении, началась ли игра
+        if (!window.socketData.game_start){
+            window.socketData.game_start = true;
+            // console.log("Signal start game confirm: ", data);
+            const room_block = document.getElementById('room-form');
+            const canvas_block = document.getElementById('play-desk-block');
+    
+            room_block.classList.add('hidden');
+            canvas_block.classList.remove('hidden');
+            window.start_game(data); 
+        }
     });
 
     socket.on('game_start_error', (error) => {
         // console.log('Error game starting', error);
         play_button.disabled = false;
-    })
+    });
 
-    socket.on('play_end', () => {
-        // отрисовать комнату
-    })
+    socket.on('game_end', () => {
+        if (window.socketData.game_start){
+            window.socketData.game_start = false;
+            // console.log("Signal end game confirm: ", data);
+            const room_block = document.getElementById('room-form');
+            const canvas_block = document.getElementById('play-desk-block');
+    
+            room_block.classList.remove('hidden');
+            canvas_block.classList.add('hidden'); 
+        }
+    });
 }
 
 play_socket();

@@ -17,9 +17,14 @@ class Player {
     }
 
     get_data() {
+        const cards = [];
+        this.cards.forEach((card) => {
+            cards.push(card.get_data);
+        })
         return {
             nickname: this.nickname,
             player_number: this.player_number,
+            cards: cards
             // is_admin: this.is_admin
         }
     }

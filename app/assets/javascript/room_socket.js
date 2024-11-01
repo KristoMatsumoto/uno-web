@@ -1,4 +1,20 @@
-function room_socket() {
+render_player_block = (players_list, data) => {
+    const player_block = document.createElement('div');
+    player_block.className = `player-info-border${data.player_number == window.socketData.player_number ? "youself" : ""}`;
+    player_block.setAttribute('data-player-num', data.player_number);
+    player_block.innerHTML = 
+        `<div class='player-info'>
+            <div class='avatar'>
+                <img src='/assets/avatar_icon.svg' alt='avatar icon'>
+            </div>
+            <div class='nickname'>${data.nickname}</div>
+            <button class='little-button get-admin${window.socketData.is_admin ? "" : " hidden"}'></button>
+            <button class='little-button remove-from-room${window.socketData.is_admin ? "" : " hidden"}'></button>
+        </div>`;
+    players_list.appendChild(player_block);
+};
+
+room_socket = () => {
     const room_block = document.querySelector('[data-room-id][data-user-name][data-user-num]');
     if (room_block){
         const players_list = document.querySelector('#players');
@@ -10,6 +26,7 @@ function room_socket() {
 
         const data = {
             room_id: room_id, 
+            game_start: false,
             nickname: nickname,
             player_number: player_number,
             is_admin: is_admin,
@@ -25,38 +42,34 @@ function room_socket() {
         socket.on('connect', () => {
             socket.emit('room_join', window.socketData);
             // console.log(`User ${socket.id} reconnecting...`);
-            socket.emit('reconnect', window.socketData);
-        // Обновить ник
         });
     
         socket.on('disconnect', () => {
             // console.log(`User ${nickname} disconnecting...`);
-        });
-    
-        socket.on('room_join', (data) => {
+        });        
+            
+        socket.on('player_join', (data) => {
             if (!players_list.querySelector(`[data-player-num="${data.player_number}"]`)){
-                const player_block = document.createElement('div');
-                player_block.className = `player-info-border${data.player_number == window.socketData.player_number ? "youself" : ""}`;
-                player_block.setAttribute('data-player-num', data.player_number);
-                player_block.innerHTML = 
-                    `<div class='player-info'>
-                        <div class='avatar'>
-                            <img src='/assets/avatar_icon.svg' alt='avatar icon'>
-                        </div>
-                        <div class='nickname'>${data.nickname}</div>
-                        <button class='little-button get-admin${window.socketData.is_admin ? "" : " hidden"}'></button>
-                        <button class='little-button remove-from-room${window.socketData.is_admin ? "" : " hidden"}'></button>
-                    </div>`;
-                players_list.appendChild(player_block);
+                render_player_block(players_list, data);
             }
             // console.log('New player join the room', data.room_id, ': ', data.nickname, "\n", data);
         });
-            
+    
+        socket.on('player_reconnect', (data) => {
+            const player_block = players_list.querySelector(`[data-player-num="${data.player_number}"]`);
+            if (player_block){
+                player_block.querySelector('.nickname').innerHTML = data.nickname;
+            } else {
+                render_player_block(players_list, data);
+            }
+            // console.log('Player ', data.nickname, " reconnect");
+        });
+
         socket.on('room_leave', (data) => {
             // console.log(`User ${data.nickname} disconected`);
             const player_block = players_list.querySelector(`[data-player-num="${data.player_number}"]`);
             players_list.removeChild(player_block);
         });
-}}
+}};
 
 room_socket();
