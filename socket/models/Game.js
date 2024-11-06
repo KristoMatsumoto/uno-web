@@ -3,6 +3,10 @@ const Card = require('./Card');
 
 class Game {
     constructor(room, rules, players) {
+        // this.ready = false;
+        rules = {
+            start_arm_lenth: 6
+        }
         // Проверка что игроков не меньше 2х
         this.room_id = room;
         this.rules = rules;
@@ -18,13 +22,17 @@ class Game {
                 this.set_player(players[i]);
             }
         }
+        this.initialize_player_arm();
         this.turn = 1;
         this.current_player = 0;
+        this.ready = true;
+
+        // Раздать карты игрокам
+        // при этом slice? (добавить проверку, хватит ли карт)
     }
 
-    initialize_deck(count = 1){
+    initialize_deck() {
         const desk = [];
-        const fulldesk = [];
         
         for (let color = 0; color < 4; color++){
             for (let value = 1; value < 10; value++){
@@ -44,14 +52,18 @@ class Game {
             desk.push(new Card('color_change'));
         }
 
-        for (let i = 0; i < count; i++){
-            fulldesk.push(...desk);
-        }
-
-        shuffle(fulldesk);
-        return fulldesk;
+        shuffle(desk);
+        return desk;
     }
 
+    initialize_player_arm(){
+        // изменить на start_arm_length
+        for (let i = 0; i < 6; i++){
+            this.players.forEach((player) => {
+                player.draw_card(this.desk.pop());
+            });
+        }
+    }
 
     set_player(player){
         this.players.push(new Player(player));
@@ -79,7 +91,8 @@ class Game {
             // room_id: this.room_id,
             players: players,
             current_player: this.current_player_number(),
-            rules: this.rules
+            rules: this.rules,
+            last_card: this.dropping[this.dropping_length - 1]
         };
     }
 }

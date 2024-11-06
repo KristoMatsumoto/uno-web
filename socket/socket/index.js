@@ -96,7 +96,7 @@ function setupWebSocket(server){
             .then(async response => {
                 if (response.headers.get('content-type').includes('application/json')) {
                     const data = await response.json();
-                    console.log('Success:', data);
+                    // console.log('Success:', data);
                 } else {
                     const errorText = await response.text();
                     // console.error('Error:', errorText.slice(1, 300), "\n\n", errorText.slice(5000, 8000));

@@ -20,13 +20,14 @@ class Card {
                 break;
 
             default:
-                this.color = null;
+                this.color = 'all';
         }
     }
 
     get_data() {
         return {
             value: this.value,
+            color: this.color
         };
     }
 }

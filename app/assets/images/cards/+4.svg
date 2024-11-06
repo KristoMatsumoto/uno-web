@@ -1,0 +1,19 @@
+<svg width="200" height="300" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="300" rx="20" fill="#E1E1E1"/>
+    <mask id="mask0_165_780" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="10" y="10" width="180" height="280">
+        <rect x="10" y="10" width="180" height="280" rx="10" fill="#141414"/>
+    </mask>
+    <g mask="url(#mask0_165_780)">
+        <rect x="10" y="10" width="180" height="280" rx="10" fill="#141414"/>
+        <ellipse cx="99.8489" cy="150.276" rx="75" ry="125" transform="rotate(35.7 99.8489 150.276)" fill="#E1E1E1"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M113 80C113 77.2386 115.239 75 118 75H158C160.761 75 163 77.2386 163 80V145C163 147.761 160.761 150 158 150H138V199C138 201.761 135.761 204 133 204H93C90.2386 204 88 201.761 88 199V177H83V225C83 227.761 80.7614 230 78 230H38C35.2386 230 33 227.761 33 225V160C33 157.239 35.2386 155 38 155H58V107C58 104.239 60.2386 102 63 102H103C105.761 102 108 104.239 108 107V129H113V80Z" fill="#141414"/>
+        <rect x="38.5" y="150.5" width="49" height="74" rx="4.5" fill="#1D59AC" stroke="#141414"/>
+        <rect x="63.5" y="97.5" width="49" height="74" rx="4.5" fill="#3F911E" stroke="#141414"/>
+        <rect x="118.5" y="70.5" width="49" height="74" rx="4.5" fill="#EDCD2C" stroke="#141414"/>
+        <rect x="93.5" y="124.5" width="49" height="74" rx="4.5" fill="#C9271D" stroke="#141414"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M54.432 15L40 39.997H40.0039V45.3535H56.0734V50.71H61.4299V45.3535H65.0009V39.997H61.4299V25.713H56.0734V39.997H46.1852L60.6172 15H54.432Z" fill="#E1E1E1"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M29.284 21.0707H23.9275V29.9982H15V35.3547H23.9275V44.2822H29.284V35.3547H38.2115V29.9982H29.284V21.0707Z" fill="#E1E1E1"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M145.569 284.71L160.001 259.713L159.997 259.713L159.997 254.356L143.928 254.356L143.928 249L138.571 249L138.571 254.356L135 254.356L135 259.713L138.571 259.713L138.571 273.997L143.928 273.997L143.928 259.713L153.816 259.713L139.384 284.71L145.569 284.71Z" fill="#E1E1E1"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M170.717 278.639L176.073 278.639L176.073 269.712L185.001 269.712L185.001 264.355L176.073 264.355L176.073 255.428L170.717 255.428L170.717 264.355L161.789 264.355L161.789 269.712L170.717 269.712L170.717 278.639Z" fill="#E1E1E1"/>
+    </g>
+</svg>

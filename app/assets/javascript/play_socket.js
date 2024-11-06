@@ -30,6 +30,7 @@ play_socket = () => {
 
     socket.on('game_start_error', (error) => {
         // console.log('Error game starting', error);
+        window.socketData.game_start = false;
         play_button.disabled = false;
     });
 

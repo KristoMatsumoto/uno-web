@@ -11,15 +11,16 @@ class Player {
 
     draw_card(card) {
         this.cards.push(card);
+        // отсортировать?
     }
-    draw_cards(cards) {
-        this.cards.push(...cards);
-    }
+    // draw_cards(cards) {
+    //     this.cards.push(...cards);
+    // }
 
     get_data() {
         const cards = [];
         this.cards.forEach((card) => {
-            cards.push(card.get_data);
+            cards.push(card.get_data());
         })
         return {
             nickname: this.nickname,
