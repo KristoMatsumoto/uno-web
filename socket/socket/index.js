@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Server } = require("socket.io");
 const Game = require("../models/Game");
+const Card = require("../models/Card");
 const players = [];
 const games = [];
 // const roomChannel = require('./room_channel');
@@ -80,7 +81,7 @@ function setupWebSocket(server){
                     .catch(error => {
                         // console.error('Error removing player from database:', error);
                     });
-            }, 10000);}
+            }, 10000); }
         });
 
         socket.on('play_start', (data) => {
@@ -110,6 +111,25 @@ function setupWebSocket(server){
                 // console.error('Error game starting:', error);
                 io.to(data.room_id).emit('game_start_error', error);
             });
+        });
+
+        socket.on('putting_card', (data) => {
+            // console.log(`Player number ${data.player_number} put card ${data.card}`);
+            const game = games[data.room_id];
+            if (game.is_card_useable(new Card(data.card.id, data.card.value, data.card.color))) {
+                game.put_card(data.player_number, data.card.id);
+                io.to(data.room_id).emit('player_put_card', {
+                    player_number: data.player_number, 
+                    card_id: data.card.id
+                });
+                io.to(data.room_id).emit('updated_cards_useability', game.get_cards_info());
+                io.to(data.room_id).emit('update_current_turn', { player_number: game.current_player_number() });
+            }
+        });
+
+        socket.on('draw_card', (data) => {
+            const card = games[data.room_id].draw_card(data.player_number);
+            io.to(data.room_id).emit('player_draw_card', { player_number: data.player_number, card: card.get_data() })
         });
     });
 }

@@ -38,6 +38,7 @@ room_socket = () => {
         
         window.websocket = socket;
         window.socketData = data;
+        if (!window.game) window.game = null;
 
         socket.on('connect', () => {
             socket.emit('room_join', window.socketData);

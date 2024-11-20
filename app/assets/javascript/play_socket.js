@@ -27,7 +27,6 @@ play_socket = () => {
             window.start_game(data); 
         }
     });
-
     socket.on('game_start_error', (error) => {
         // console.log('Error game starting', error);
         window.socketData.game_start = false;
@@ -43,7 +42,27 @@ play_socket = () => {
     
             room_block.classList.remove('hidden');
             canvas_block.classList.add('hidden'); 
+            window.end_game(); 
         }
+    });
+
+    socket.on('player_put_card', (data) => {
+        // console.log(`Player put card id${data.card_id}`);
+        window.game.put_card(data.player_number, data.card_id);
+    });
+    socket.on('player_draw_card', (data) => {
+        // console.log(`Player draw card id${data.card.id}`);
+        window.game.draw_card(data.player_number, data.card);
+    });
+
+    socket.on('updated_cards_useability', (data) => {
+        window.game.update_cards_useability(data);
+        // console.log("Cards useability have been updated");
+    });
+
+    socket.on('update_current_turn', (data) => {
+        window.game.update_current_turn(data.player_number);
+        // console.log("Current turn have been updated");
     });
 }
 
