@@ -7,20 +7,22 @@
     min-width: 90vw;
     @extend %doubled-container-front;
     @extend %pare-container;
-
-    > :nth-of-type(1){
-        padding: 10px 10px 0;
-        border-top: none;
-        border-right: solid 5px $form-color;
+    @media only screen and (max-width: 500px) {
+        height: calc(100vh - 20px);
     }
-    > :nth-of-type(2){
+
+    > * {
+        display: flex;
+        flex-direction: column;
+    }
+    > :nth-of-type(3) {
         display: flex;
         flex-wrap: nowrap;
         flex-direction: column;
         
-        > .settings-block {
-            flex: 1 1 auto;
-            background: $container;
+        @media only screen and (max-width: 500px) {
+            height: 100vh;
+            align-self: flex-start;
         }
     }
     .player-info-border{
@@ -38,56 +40,96 @@
             border-radius: 5px;
             padding: 10px 10px;
     
-            > *{
-                flex: 0 0 auto;
-            }
-            > .nickname{
-                flex: 1 1 auto;
-            }
+            > * { flex: 0 0 auto; }
+            > .nickname { flex: 1 1 auto; }
         }
     }
-    .player-info-border:hover {
-        background-color: $button-color;
-    }
-    .player-info-border.youself{
-        background-color: $container;
-    }
-    #players{
+    .player-info-border:hover { background-color: $button-color; }
+    .player-info-border.youself { background-color: $container; }
+    #players {
         flex: 0 1 auto;
-        min-height: 500px;
+        gap: 10px;
+        height: 500px;
         min-width: calc(5vw + 20rem);
+        border-radius: 0;
+        border-right: solid 1px $button-border;
+
+        > * { margin: 0 10px; }
+        > *:nth-of-type(1) { margin-top: 10px; }
+        @media only screen and (max-width: 500px) {
+            background-color: $button-border; 
+            height: 100%;
+        }
+    }
+    .settings-block { 
+        flex: 1 1 auto;
+        background-color: $button-border;
+        @media only screen and (max-width: 500px) {
+            order: 3;
+            // background-color: $button-border; 
+            
+        } 
+    }
+    #players, .settings-block { 
+        @extend %scroll-bar;
+        overflow: hidden;
+        overflow-y: scroll;
+        @media only screen and (max-width: 500px) {
+            box-sizing: border-box;
+            height: 100%;
+            transition: height 1.5s ease; 
+            border-style: solid;
+            border-width: 5px 0;
+            border-color: $form-color;
+            //     border-bottom: solid 5px $form-color;
+            //     border-right: none;;
+        }        
+    }
+    #hidden-button {
+        display: none;
+        border: none;
+        outline: none;
+        text-align: center;
+        background-color: $input-background;
+        color: $input-color;
+        font-size: 1.5rem;
+        padding: 5px;
+        flex: 0 0 auto;
+        @media only screen and (max-width: 500px) { display: block; }
+    }
+    #players.hidden-block,
+    .settings-block.hidden-block {
+        @media only screen and (max-width: 500px) {
+            height: 0;
+            border: none;
+            // padding: 0;
+        }
     }
     .avatar{
         @include circle(70px);
         border: solid 5px $avatar-background;
         background-color: $avatar-background;
     
-        > * {
-            @include circle(70px);
-        }
+        > * {  @include circle(70px); }
     }
-    .room-info{
+    .room-info {
         display: flex;
         flex-wrap: nowrap;
         flex-direction: row;
         gap: 10px;
         padding: 10px;
 
-        * {
-            flex: 0 1 auto;
-            transition: flex-grow 1s ease;
-        }
+        * { flex: 0 1 auto; }
     }
 }
-.little-button{
+.little-button {
     @extend %buttons;
     @extend %center-one-container;
     @include circle(40px);
     background: none;
     border: solid 5px #0000;
-    * {
-        @include circle(30px);
-    }
+    
+    @media only screen and (max-width: 500px) { @include circle(25px); }
     // svg > *{
     //     fill: $form-color;
     // }
@@ -96,89 +138,77 @@
     //     stoke: $form-background;
     // }
 }
-.little-button:hover{
-    background-color: $input-border;
-}
-.little-button:active{
-    background-color: $button-color;
-}
-.little-button.get-admin{
-    @include button-icon('room_admin_icon.png', 30px);
-}
-.little-button.remove-from-room{
-    @include button-icon('delete_player_icon.png', 30px);
-}
-.setting-button-block{
+.little-button:hover { background-color: $input-border; }
+.little-button:active { background-color: $button-color; }
+.little-button.get-admin { @include button-icon('room_admin_icon.png', 30px); }
+.little-button.remove-from-room { @include button-icon('delete_player_icon.png', 30px); }
+.little-button.get-admin, 
+.little-button.remove-from-room { @media only screen and (max-width: 500px) { background-size: 20px; } }
+.setting-button-block {
     @extend %flex-container-row;
+    width: 3rem;
     max-width: 250px;
     border: solid 5px #0000;
     background-color: $form-background;
     border-radius: 20px;
+    transition: flex-grow 1.5s ease;
     
-    * {
+    p {
         display: none;
+        overflow: hidden;
+        transition: width 1.5s ease;
     }
-    .setting-button{
-        display: inline-block;
-    }
+    .setting-button:not(.hidden) { display: inline-block; }
 }
 .setting-button-block:hover {
     flex-grow: 1;
-    // flex-basis: auto;
     border-color: $input-background;
     background-color: $form-background;
-    *{
-        display: inline-block;
+    @media only screen and (max-width: 500px) { flex-grow: 0; }
+
+    .setting-button { flex-shrink: 0; }
+    p:not(.hidden) { 
+        display: inline-block; 
+        text-overflow: clip; 
+        white-space: nowrap; 
     }
 }
 .setting-button {
     @extend %buttons;
     @extend %center-one-container;
     background-color: #0000;
-    width: 50px;
-    height: 50px;
+    width: 3rem;
+    height: 3rem;
 }
-.setting-button#copy-link {
-    @include button-icon('copy_link_icon.svg', 50px);
-}
-.setting-button#copy-code {
-    @include button-icon('copy_code_icon.svg', 50px);
-}
-.setting-button#hide-code {
-    @include button-icon('hide_code_icon.svg', 50px);
-}
+.setting-button#copy-link { @include button-icon('copy_link_icon.svg', 3rem); }
+.setting-button#copy-code { @include button-icon('copy_code_icon.svg', 3rem); }
+.setting-button#hide-code { @include button-icon('hide_code_icon.svg', 3rem); }
+.setting-button#show-code { @include button-icon('show_code_icon.svg', 3rem); }
 
 @media only screen and (max-width: 500px) {
-    .room-container{
+    .room-container {
         flex-direction: column-reverse;
         border: none;
 
-        > :nth-of-type(1){
-            border-top: solid 5px $form-color;
-            border-right: none;
-        }
-        .avatar, .avatar > *{
-            @include circle(35px);
-        }
+        .avatar, .avatar > *{ @include circle(35px); }
     }
-    .little-button {
-        @include circle(25px);
 
-        * {
-            @include circle(20px);
-        }
-    }
+    .setting-button-block:hover > *:not(.hidden):not(.setting-button) { display: none; }
 }
 
-#code{
+#code {
     @extend %center-one-container;
     background: #fff;
-    text-align: center;
-    border-radius: 10px;
     padding: 0 10px;
-    font-size: 3rem;
+    border-radius: 10px;
     border: solid 3px $container;
+    
+    .back {
+        text-align: center;
+        font-size: 3rem;
+    }
 }
+#code.hide-code .back { visibility: hidden; }
 
 canvas#play-desk{
     width: 100%;

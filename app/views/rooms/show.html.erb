@@ -14,25 +14,28 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
                 </div></div>
             <% end %>
         </div>
-
+        <button id='hidden-button' onclick='showBlock()'>Show game settings</button>
         <div>
             <div class='room-info'>
-                <div id='code'><%= @room.code %></div>
-                <button class='setting-button-block'>
+                <div id='code' data-link='<%= 'link' %>'><div class='back'><%= @room.code %></div></div>  
+                <button class='setting-button-block' onclick='codeHideOrShow()'>
                     <div class='setting-button' id='hide-code'></div>
-                    <p>Hide room code</p>
+                    <div class='setting-button hidden' id='show-code'></div>
+                    <p class='hide'>Hide room code</p>
+                    <p class='show hidden'>Show room code</p>
                 </button>
-                <button class='setting-button-block' onclick='copyText()'>
+                <button class='setting-button-block' onclick='copyCode()'>
                     <div class='setting-button' id='copy-code'></div>
                     <p>Copy room code</p>
                 </button>
-                <button class='setting-button-block'>
+                <button class='setting-button-block' onclick='copyLink()'>
                     <div class='setting-button' id='copy-link'></div>
                     <p>Copy link to room</p>
                 </button>
             </div>
             <%= javascript_include_tag "copy_text", 'data-turbo-track': 'reload' %>
-            <div class='settings-block'>
+            <%= javascript_include_tag "hide_or_show_code", 'data-turbo-track': 'reload' %>
+            <div class='settings-block hidden-block'>
                 <%= form_with do | form | %>
 
                 <% end %>
@@ -44,7 +47,7 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
                 <button id='start-game' class='play-button <% if !@player.room_player.is_admin? %> hidden<% end %>'>START</button>
             </div>
         </div>
-    </div></div>
+    </div></div><%= javascript_include_tag "transition_blocks", 'data-turbo-track': 'reload' %>
 </div>
 
 <div class='form-page <% if !@room.game_start? %>hidden<% end %>' id='play-desk-block'>

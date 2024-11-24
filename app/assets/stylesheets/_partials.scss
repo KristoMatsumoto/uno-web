@@ -11,6 +11,11 @@
     border-style: none;
     text-align: center;
 }
+%scroll-bar {
+    scrollbar-color: $input-background $button-border;
+    scrollbar-width: auto;
+    overflow-y: scroll;
+}
 
 // FORM STYLE
 %form-borders {
@@ -35,15 +40,6 @@
     justify-content: space-around;
     align-items: center;
 }
-@media only screen and (max-width: 500px){
-    %center-one-container{
-        justify-content: stretch;
-        align-items: baseline;
-        > *{
-            flex: 1 1 auto;
-        }
-    }
-}
 %flex-container {
     display: flex;
     justify-content: space-around;
@@ -56,13 +52,7 @@
     align-items: center;
     flex-wrap: nowrap;
     padding: 10px;
-
-    > *{
-        margin-right: 10px;
-    }
-    > *:nth-last-of-type(1){
-        margin-right: 0;
-    }
+    gap: 10px;
 }
 %pare-container {
     display: flex;
