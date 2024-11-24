@@ -11,6 +11,6 @@ class RoomPlayer < ApplicationRecord
   private 
 
   def set_player_number
-    self.player_num = self.room.get_next_player_num
+    self.player_num = self.room.get_next_player_num if (self.player_num.blank?)
   end
 end

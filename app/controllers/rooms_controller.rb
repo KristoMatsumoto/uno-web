@@ -1,5 +1,5 @@
 class RoomsController < ApplicationController  
-  skip_before_action :verify_authenticity_token, only: [:leave, :start]
+  skip_before_action :verify_authenticity_token, only: [:leave, :start, :get_admin]
   before_action :set_player, only: [:new, :create, :join, :show]
   before_action :set_player_nickname, only: [:create, :join]
   before_action :is_player_in_room, only: [:show]
@@ -61,6 +61,16 @@ class RoomsController < ApplicationController
     else
       render json: { error: 'Player not found' }, status: :not_found
     end    
+  end
+
+  def get_admin
+    room = Room.find(params[:room_id])
+    player = room.room_players.find_by(player_num: params[:player_num])
+    if player && player.update({ :is_admin => true })
+      render json: { message: 'Player got admin access' }, status: :ok
+    else
+      render json: { error: 'Player not found' }, status: :not_found
+    end   
   end
 
   def start

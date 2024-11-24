@@ -51,7 +51,7 @@ function setupWebSocket(server){
         socket.on('disconnect', () => {
             if (!(socket.data && socket.data.room_id && socket.data.player_number)) return;
             // console.log(`A user ${socket.data.nickname} disconnected`);
-            if (!games[socket.data.room_id] && players[socket.data.room_id]){
+            if (!games[socket.data.room_id] && players[socket.data.room_id] && players[socket.data.room_id][socket.data.player_number]){
                 players[socket.data.room_id][socket.data.player_number].timer = setTimeout(() => {
                     socket.leave(socket.data.room_id);
                     // console.log(`Player ${socket.data.nickname} left room ${socket.data.room_id}`);
@@ -67,7 +67,7 @@ function setupWebSocket(server){
                     .then(async response => {
                         if (response.ok) {
                             // console.log('Player removed from database:', socket.data.nickname);
-                            io.to(socket.data.room_id).emit('room_leave', socket.data);
+                            io.to(socket.data.room_id).emit('player_leave', socket.data);
                             delete players[socket.data.room_id][socket.data.player_number];
                         } else {
                             const errorText = await response.text();
@@ -80,6 +80,53 @@ function setupWebSocket(server){
 
                     // добавить проверку удаления комнаты
             }, 10000); }
+        });
+
+        socket.on('remove_player', (data) => {
+            if (!data.is_admin) return;
+            fetch(`${process.env.APP_PATH}/rooms/${data.room_id}/leave/${data.player_number}`, {
+                method: 'DELETE',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': socket.data.csrfToken,
+                    'Cookie': socket.data.cookie
+                }
+            })
+            .then(async response => {
+                if (response.ok) {
+                    // console.log('Player', data.player_number, 'removed from database');
+                    io.to(data.room_id).emit('player_removed', { player_number: data.player_number } );
+                    delete players[data.room_id][data.player_number];
+                } else {
+                    const errorText = await response.text();
+                    // console.error('Error:', errorText);
+                }
+            })
+            .catch(error => { // console.error('Error while removing player from database:', error);
+            });            
+        });
+        socket.on('get_admin', (data) => {
+            if (!data.is_admin) return;
+            fetch(`${process.env.APP_PATH}/rooms/${data.room_id}/get_admin/${data.player_number}`, {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': socket.data.csrfToken,
+                    'Cookie': socket.data.cookie
+                }
+            })
+            .then(async response => {
+                if (response.ok) {
+                    // console.log('Player', data.player_number, 'got admin access');
+                    players[data.room_id][data.player_number].is_admin = true;
+                    io.to(data.room_id).emit('player_got_admin', { player_number: data.player_number });
+                } else {
+                    const errorText = await response.text();
+                    // console.error('Error:', errorText);
+                }
+            })
+            .catch(error => { // console.error('Error while getting admin access:', error);
+            });
         });
 
         socket.on('play_start', (data) => {
@@ -108,37 +155,36 @@ function setupWebSocket(server){
             });
         });
 
+        check_statuses = (room_id, statuses) => {
+            const info_object = statuses.pop();
+            // console.log("Statuses:", statuses, "\nInfo: ", info_object, "\n");
+
+            if (statuses.find(status => status === Game.STATUS.GIVED_CARDS))
+                io.to(room_id).emit('players_draw_cards', info_object.give_cards);
+            if (statuses.find(status => status === Game.STATUS.CHECK_ON_COLOR_SELECTION))
+                io.to(room_id).emit('check_on_color_selection', info_object.player_select);
+
+            io.to(room_id).emit('updated_cards_useability', games[room_id].get_cards_info());
+            io.to(room_id).emit('update_current_turn', { player_number: games[room_id].current_player_number() });
+        }
         socket.on('putting_card', (data) => {
-            console.log(`Player number ${data.player_number} put card `, data.card);
+            // console.log(`Player number ${data.player_number} put card `, data.card);
             const game = games[data.room_id];
             const statuses = game.put_card(data.player_number, data.card.id);
             if (statuses.find(status => status === Game.STATUS.FAILED)) return;
-            const info_object = statuses.pop();
-            console.log(info_object, "\n");
-            if (statuses.find(status => status === Game.STATUS.GIVED_CARDS))
-                io.to(data.room_id).emit('players_draw_cards', info_object.give_cards);
-            if (statuses.find(status => status === Game.STATUS.CHECK_ON_COLOR_SELECTION))
-                io.to(data.room_id).emit('check_on_color_selection', info_object.player_select);
             io.to(data.room_id).emit('player_put_card', {
                 player_number: data.player_number, 
                 card_id: data.card.id
             });
-            io.to(data.room_id).emit('updated_cards_useability', game.get_cards_info());
-            io.to(data.room_id).emit('update_current_turn', { player_number: game.current_player_number() });
+            check_statuses(data.room_id, statuses);
         });
 
         socket.on('color_selected', (data) => {
-            console.log(`Player number ${data.player_number} select color`, data.color);
-            const game = games[data.room_id];
-            const statuses = game.select_color(data.player_number, data.color);
+            // console.log(`Player number ${data.player_number} select color`, data.color);
+            const statuses = games[data.room_id].select_color(data.player_number, data.color);
             if (statuses.find(status => status === Game.STATUS.FAILED)) return;
-            const info_object = statuses.pop();
-            console.log(info_object, "\n");
-            if (statuses.find(status => status === Game.STATUS.GIVED_CARDS))
-                io.to(data.room_id).emit('players_draw_cards', info_object.give_cards);
             io.to(data.room_id).emit('player_select_color', data.color);
-            io.to(data.room_id).emit('updated_cards_useability', game.get_cards_info());
-            io.to(data.room_id).emit('update_current_turn', { player_number: game.current_player_number() });
+            check_statuses(data.room_id, statuses);
         })
 
         socket.on('draw_card', (data) => {

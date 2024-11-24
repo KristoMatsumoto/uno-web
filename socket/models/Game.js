@@ -9,6 +9,8 @@ class Game {
         SUCCESS: 'success',
         GIVED_CARDS: 'gived cards',
         CHECK_ON_COLOR_SELECTION: 'check color selection',
+        PLAYER_FINISHED: 'player finished game',
+        GAME_OVER: 'game over',
 
         FAILED: 'failed'
     } 
@@ -22,7 +24,8 @@ class Game {
         rules = {
             players_count: players.length,
             start_arm_lenth: 6,
-            skip_after_draw_card: true,
+            skip_after_draw_cards: true,
+            skip_after_draw_card_from_dropping: true,
         }
         // Проверка что игроков не меньше 2х
         this.room_id = room;
@@ -43,10 +46,17 @@ class Game {
 
         this.cards_to_draw = 0;
         this.check_on_color_selection = false;
+        this.color_selection_player = null;
         // Раздать карты игрокам
         // при этом slice? (добавить проверку, хватит ли карт)
     }
 
+    static push_statuses(statuses, add_info) {
+        let info_object = { ...statuses.pop(), ...add_info.pop() };
+        statuses.push(add_info);
+        statuses.push(info_object);
+        return statuses;
+    }
     static shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             let j = Math.floor(Math.random() * (i + 1));
@@ -114,21 +124,20 @@ class Game {
         if (player_i == undefined) return [ Game.STATUS.FAILED ]; // ONLY == because player_i == undefined TRUE where player_i = undefined || null
         this.current_player = player_i; 
 
-        // проверить дать ли карты
-        const statuses = [ Game.STATUS.SUCCESS ];
-        const info_object = {};
+        const statuses = [ Game.STATUS.SUCCESS, {} ];
         if (this.cards_to_draw !== 0) {
             if (this.is_player_can_hit_card(player_i, this.dropping[this.dropping.length - 1])) {
                 // ...
+        // проверить дать ли карты
             } else {
-                statuses.push(Game.STATUS.GIVED_CARDS);
-                info_object.give_cards = [];
-                info_object.give_cards.push(this.give_cards_for(this.players[this.current_player], this.cards_to_draw));
+                Game.push_statuses(statuses, [ 
+                    Game.STATUS.GIVED_CARDS, 
+                    { give_cards: this.give_cards_for(this.players[this.current_player], this.cards_to_draw) }
+                ]);
                 this.cards_to_draw = 0; 
-                if (this.rules.skip_after_draw_card) { this.next_turn(); }
+                if (this.rules.skip_after_draw_cards) { Game.push_statuses(statuses, this.next_turn()); }
             }
         }
-        statuses.push(info_object);
         return statuses;
     }
     current_player_number() { return this.players[this.current_player].player_number; }
@@ -162,10 +171,11 @@ class Game {
     
     put_card(player_number, card_id) {
         const player = this.players.find(player => player.player_number === player_number);
-        const card = player.put_card(card_id);
+        let card = player.cards.find(card => card.id === card_id);
         if (!card || !this.is_card_useable(card)) return [ Game.STATUS.FAILED ];
-        const statuses = [];
-        let info_object = {};
+        card = player.put_card(card_id);
+        
+        const statuses = [Game.STATUS.SUCCESS, {}];
         this.dropping.push(card);
         switch (card.value) {
             case Card.CARD_DIRECTION: 
@@ -173,36 +183,28 @@ class Game {
             case Card.CARD_SKIP: 
                 this.next_turn(); break;
             case Card.CARD_PLUS2:
-                // statuses.push(Game.STATUS.GIVED_CARDS);
                 this.cards_to_draw += 2;
-                // info_object.give_cards = []
-                // info_object.give_cards.push(this.give_cards_for(this.players[this.get_next_player()], 2)); 
-                // this.next_turn(); 
                 break;
             case Card.CARD_PLUS4:
-                // statuses.push(Game.STATUS.GIVED_CARDS);
-                statuses.push(Game.STATUS.CHECK_ON_COLOR_SELECTION);
+                Game.push_statuses(statuses, [
+                    Game.STATUS.CHECK_ON_COLOR_SELECTION,
+                    { player_select: player_number }
+                ])
                 this.check_on_color_selection = true;
-                info_object.player_select = player_number;
+                this.color_selection_player = player_number;
                 this.cards_to_draw += 4;
-                // info_object.give_cards = []
-                // info_object.give_cards.push(this.give_cards_for(this.players[this.get_next_player()], 4)); 
-                // this.next_turn(); 
                 break;
             case Card.CARD_COLOR_CHANGE:
-                statuses.push(Game.STATUS.CHECK_ON_COLOR_SELECTION);
+                Game.push_statuses(statuses, [
+                    Game.STATUS.CHECK_ON_COLOR_SELECTION,
+                    { player_select: player_number }
+                ])
                 this.check_on_color_selection = true;
-                info_object.player_select = player_number;
+                this.color_selection_player = player_number;
                 break;
         }
         this.set_useability();
-        if (this.is_next_turn()) {
-            const answer = this.next_turn();
-            info_object = { ...info_object, ...answer.pop() };
-            statuses.push(...answer);
-        }
-        statuses.push(Game.STATUS.SUCCESS);
-        statuses.push(info_object);
+        if (this.is_next_turn()) { Game.push_statuses(statuses, this.next_turn()); }
         return statuses;
     }
     give_cards_for(player, count) {
@@ -232,8 +234,9 @@ class Game {
             !(player_number == this.current_player_number()) || 
             !this.dropping[this.dropping.length - 1].set_selected_color(color)
         ) 
-            return [ Game.STATUS.FAILED ];
+            return [ Game.STATUS.FAILED, {} ];
         this.check_on_color_selection = false;
+        this.color_selection_player = null;
         return this.next_turn();
     }
     // can put card?
@@ -253,7 +256,8 @@ class Game {
             current_player: this.current_player_number(),
             rules: this.rules,
             last_card: this.dropping[this.dropping.length - 1].get_data(),
-            check_on_color_selection: this.check_on_color_selection
+            check_on_color_selection: this.check_on_color_selection,
+            color_selection_player: this.color_selection_player
         };
     }
 }

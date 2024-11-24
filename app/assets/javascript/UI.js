@@ -1,4 +1,6 @@
 class UI {
+    draw_color_selection = false;
+
     constructor(width, height, data, ctx){
         // -------------------- MAIN
         this.room_id = data.room_id;
@@ -44,7 +46,8 @@ class UI {
         //         this.this_player_turn = i;
         //     }
         // }
-        this.draw_color_selection = data.check_on_color_selection;
+        if (data.check_on_color_selection && data.color_selection_player === this.this_player_number)
+            this.draw_color_selection = data.check_on_color_selection;
         this.color_selection_position = [];
 
         this.update_sizes();        
@@ -223,7 +226,7 @@ class UI {
             } else {
                 const position = -this.card_width * 2;
                 let step = (this.card_width * 3 - this.card_width) / (player.cards.length - 1);
-                if (player_cards.length === 1) step = 0;
+                if (player.cards.length === 1) step = 0;
                 this.ctx.drawImage(this.get_card({value: 'back', color: 'all'}), position + step * i, 0, this.card_width, this.card_height);
             }
         }
@@ -310,7 +313,7 @@ class UI {
         this.ctx.clearRect(0, 0, this.canvas_width, this.canvas_height);
         this.ctx.beginPath();
         
-        this.draw_players();
+        if (this.players) this.draw_players();
         this.draw_dropping();
         this.draw_desk();
 

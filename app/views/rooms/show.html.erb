@@ -9,8 +9,8 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
                         <%= image_tag 'avatar_icon.svg' %>
                     </div>
                     <div class='nickname'><%= truncate player.player.nickname, length: 16 %></div>
-                    <button class='little-button get-admin<% if !@player.room_player.is_admin? %> hidden<% end %>'></button>
-                    <button class='little-button remove-from-room<% if !@player.room_player.is_admin? %> hidden<% end %>'></button>
+                    <button class='little-button get-admin<% if !@player.room_player.is_admin? %> admin-hidden<% end %><% if player == @player.room_player %> hidden<% end %>' onclick='get_admin(<%= player.player_num %>)' ></button>
+                    <button class='little-button remove-from-room<% if !@player.room_player.is_admin? %> admin-hidden<% end %><% if player == @player.room_player %> hidden<% end %>' onclick='remove_player(<%= player.player_num %>)' ></button>
                 </div></div>
             <% end %>
         </div>
@@ -41,7 +41,7 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
                 <%= button_to new_room_path, method: :get, class: 'dangerous-button' do %>
                     LEAVE ROOM
                 <% end %>
-                <button id='start-game' class='play-button <% if !@player.room_player.is_admin? %> hidden<% end %>'>START</button>
+                <button id='start-game' class='play-button<% if !@player.room_player.is_admin? %> admin-hidden<% end %>'>START</button>
             </div>
         </div>
     </div></div>

@@ -8,11 +8,16 @@ render_player_block = (players_list, data) => {
                 <img src='/assets/avatar_icon.svg' alt='avatar icon'>
             </div>
             <div class='nickname'>${data.nickname}</div>
-            <button class='little-button get-admin${window.socketData.is_admin ? "" : " hidden"}'></button>
-            <button class='little-button remove-from-room${window.socketData.is_admin ? "" : " hidden"}'></button>
+            <button class='little-button get-admin${window.socketData.is_admin ? "" : " admin-hidden"}${data.player_number == window.socketData.player_number ? " hidden" : ""}' onclick='get_admin(${data.player_number})'></button>
+            <button class='little-button remove-from-room${window.socketData.is_admin ? "" : " admin-hidden"}${data.player_number == window.socketData.player_number ? " hidden" : ""}' onclick='remove_player(${data.player_number})' ></button>
         </div>`;
     players_list.appendChild(player_block);
 };
+
+remove_player_block = (players_list, player_number) => {
+    const player_block = players_list.querySelector(`[data-player-num="${player_number}"]`);
+    players_list.removeChild(player_block);
+}
 
 room_socket = () => {
     const room_block = document.querySelector('[data-room-id][data-user-name][data-user-num]');
@@ -66,10 +71,27 @@ room_socket = () => {
             // console.log('Player ', data.nickname, " reconnect");
         });
 
-        socket.on('room_leave', (data) => {
+        socket.on('player_leave', (data) => {
             // console.log(`User ${data.nickname} disconected`);
-            const player_block = players_list.querySelector(`[data-player-num="${data.player_number}"]`);
-            players_list.removeChild(player_block);
+            remove_player_block(players_list, data.player_number);
+        });
+
+        socket.on('player_removed', (data) => {
+            // console.log('Player ', data.player_number, " removed");
+            if (data.player_number == window.socketData.player_number)
+                window.location.href = '/rooms/new';
+            else 
+                remove_player_block(players_list, data.player_number);
+        });
+
+        socket.on('player_got_admin', (data) => {
+            console.log('Player ', data.player_number, " got admin access");
+            if (data.player_number == window.socketData.player_number) {
+                window.socketData.is_admin = true;
+                document.querySelectorAll('.admin-hidden').forEach((elem) => {
+                    elem.classList.remove('admin-hidden');
+                });
+            }
         });
 }};
 
