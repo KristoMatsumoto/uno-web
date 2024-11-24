@@ -54,15 +54,26 @@ play_socket = () => {
         // console.log(`Player draw card id${data.card.id}`);
         window.game.draw_card(data.player_number, data.card);
     });
-
-    socket.on('updated_cards_useability', (data) => {
-        window.game.update_cards_useability(data);
-        // console.log("Cards useability have been updated");
+    socket.on('players_draw_cards', (data) => {
+        window.game.draw_cards(data);
     });
 
+    socket.on('updated_cards_useability', (data) => {
+        // console.log("Cards useability have been updated", data);
+        window.game.update_cards_useability(data);
+    });
     socket.on('update_current_turn', (data) => {
         window.game.update_current_turn(data.player_number);
         // console.log("Current turn have been updated");
+    });
+
+    socket.on('check_on_color_selection', (data) => {
+        // console.log("Check on color selection from player " + data);
+        window.game.check_color_selection(data);
+    });
+    socket.on('player_select_color', (data) => {
+        // console.log("Selected color: ", data);
+        window.game.update_selected_color(data);
     });
 }
 

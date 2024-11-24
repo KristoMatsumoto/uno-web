@@ -42,7 +42,7 @@ room_socket = () => {
 
         socket.on('connect', () => {
             socket.emit('room_join', window.socketData);
-            // console.log(`User ${socket.id} reconnecting...`);
+            // console.log(`User ${socket.id} connecting...`);
         });
     
         socket.on('disconnect', () => {

@@ -14,7 +14,7 @@ class Player {
         // отсортировать?
     }
     put_card(card_id) {
-        const card_i = this.cards.findIndex(card => card.get_id() === card_id);
+        const card_i = this.cards.findIndex(card => card.id === card_id);
         return this.cards.splice(card_i, 1)[0];
     }
     // draw_cards(cards) {

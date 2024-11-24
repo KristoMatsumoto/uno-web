@@ -44,10 +44,42 @@ class UI {
         //         this.this_player_turn = i;
         //     }
         // }
-        this.set_players_block_angle();
-        this.set_this_player_cards_position();
+        this.draw_color_selection = data.check_on_color_selection;
+        this.color_selection_position = [];
+
+        this.update_sizes();        
     } 
 
+    set_color_selection_positions() {
+        const x_center = this.canvas_width / 2;
+        const y_center = this.canvas_height / 2;
+        this.color_selection_position = [
+            {
+                color_name: 'green',
+                color: this.colors.green,
+                pos_x: x_center - this.card_width - 10,
+                pos_y: y_center - this.card_width - 10
+            }, 
+            {
+                color_name: 'yellow',
+                color: this.colors.yellow,
+                pos_x: x_center + 10,
+                pos_y: y_center - this.card_width - 10
+            }, 
+            {
+                color_name: 'blue',
+                color: this.colors.blue,
+                pos_x: x_center - this.card_width - 10,
+                pos_y: y_center + 10
+            }, 
+            {
+                color_name: 'red',
+                color: this.colors.red,
+                pos_x: x_center + 10,
+                pos_y: y_center + 10
+            }, 
+        ];
+    }
     set_players_block_angle() {
         const other_players_count = this.players.length - 1;
 
@@ -70,7 +102,8 @@ class UI {
         const player_cards = player.cards;
         const width = this.canvas_width / 2;
         const start_position = -this.canvas_width / 4;
-        const step = (width - this.client_card_width()) / (player_cards.length - 1);
+        let step = (width - this.client_card_width()) / (player_cards.length - 1);
+        if (player_cards.length === 1) step = 0;
         for (let i = 0; i < player_cards.length; i++) {
             player_cards[i].pos_x = start_position + step * i;
             if (player_cards[i].selected) { 
@@ -189,7 +222,8 @@ class UI {
                 );
             } else {
                 const position = -this.card_width * 2;
-                const step = (this.card_width * 3 - this.card_width) / (player.cards.length - 1);
+                let step = (this.card_width * 3 - this.card_width) / (player.cards.length - 1);
+                if (player_cards.length === 1) step = 0;
                 this.ctx.drawImage(this.get_card({value: 'back', color: 'all'}), position + step * i, 0, this.card_width, this.card_height);
             }
         }
@@ -247,6 +281,30 @@ class UI {
         }
     }
 
+    draw_color_selection_miniblock(pos_x, pos_y, size, color) {
+        if (
+            this.client_mouse_x >= pos_x &&
+            this.client_mouse_x <= pos_x + size &&
+            this.client_mouse_y >= pos_y && 
+            this.client_mouse_y <= pos_y + size
+        ) {
+            this.ctx.fillStyle = 'white';
+            this.ctx.fillRect(pos_x - 5, pos_y - 5, size + 10, size + 10);
+        }
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(pos_x, pos_y, size, size);
+    }
+    draw_color_selection_block() {
+        const x_center = this.canvas_width / 2;
+        const y_center = this.canvas_height / 2;
+        const size = this.card_width * 2 + 60;
+        
+        this.ctx.fillStyle = 'gray';
+        this.ctx.fillRect(x_center - this.card_width - 30, y_center - this.card_width - 30, size, size);
+        this.color_selection_position.forEach((color_prop) => {
+            this.draw_color_selection_miniblock(color_prop.pos_x, color_prop.pos_y, this.card_width, color_prop.color);
+        });
+    }
     render() {
         this.ctx.save();
         this.ctx.clearRect(0, 0, this.canvas_width, this.canvas_height);
@@ -255,6 +313,9 @@ class UI {
         this.draw_players();
         this.draw_dropping();
         this.draw_desk();
+
+        if (this.draw_color_selection) 
+            this.draw_color_selection_block();
         // отрисовать подбор
         // отрисовать кнопку UNO
 
@@ -309,13 +370,16 @@ class UI {
         const player_up = players.find(player => player.player_number = this.this_player_number);
         this.players[this.players.length - 1].cards.forEach((card) => {
             card.useable = player_up.cards.find(card_up => card.id === card_up.id).useable;
-        }); // = players[player_i].cards;
+        });
     }
     update_current_turn(player_number) {
         this.current_turn = player_number;
         this.set_this_player_cards_position();
         // this.current_turn_time = 120;
         // this.current_turn_timer = setInterval(() => {}, 1000);
+    }
+    update_selected_color(color) {
+        this.draw_color_selection = false;
     }
     update_mouse_position(x, y) {
         this.client_mouse_x = x;
@@ -326,9 +390,10 @@ class UI {
         // card_width, card_heigth
         this.set_players_block_angle();
         this.set_this_player_cards_position();
+        this.set_color_selection_positions();
     }
     
-    resize(width, height){
+    resize(width, height) {
         this.canvas_width = width;
         this.canvas_height = height;
         this.update_sizes();
@@ -341,14 +406,30 @@ class UI {
         const card = player.cards.splice(card_i, 1)[0];
         this.update_dropping(card);
     }
-    draw_card(player_number, card) {
+    player_draw_cards(player_number, cards) {
         const player = this.players[this.players.findIndex(player => player.player_number === player_number)];
-        player.cards.push(card);
-        if (this.is_this_player(player)) this.set_this_player_cards_position();
+        cards.forEach((card) => {
+            player.cards.push(card);
+        });        
+    }
+    draw_cards(players) {
+        players.forEach((player) => {
+            this.player_draw_cards(player.player_number, player.cards);
+            if (this.is_this_player(player)) this.set_this_player_cards_position();
+        });
+    }
+    check_color_selection(player_number) {
+        if (this.this_player_number === player_number) 
+            this.draw_color_selection = true;
     }
 
     // CLICKING CHECK
-    is_clicking_on_card() { return this.get_selected_card(); }
+    is_clicking_on_card() { 
+        if (this.draw_color_selection) return null;
+        const card =  this.get_selected_card();
+        if (card.color === 'all') this.draw_color_selection = true;
+        return card; 
+    }
     is_clicking_on_desk() {
         if (this.players[this.players.length - 1].player_number !== this.current_turn) return false;
         const pos_x = (this.canvas_width - this.card_width) / 2 - this.card_width * 2;
@@ -356,5 +437,19 @@ class UI {
         return this.client_mouse_x && this.client_mouse_y && 
             this.client_mouse_x >= pos_x && this.client_mouse_x <= pos_x + this.card_width && 
             this.client_mouse_y >= pos_y && this.client_mouse_y <= pos_y + this.card_height;
+    }
+    is_clicking_on_color() {
+        if (this.draw_color_selection) {
+            let color; 
+            this.color_selection_position.forEach((color_prop) => {
+                if (
+                    this.client_mouse_x >= color_prop.pos_x &&
+                    this.client_mouse_x <= color_prop.pos_x + this.card_width &&
+                    this.client_mouse_y >= color_prop.pos_y && 
+                    this.client_mouse_y <= color_prop.pos_y + this.card_width
+                ) { color = color_prop.color_name; }
+            });
+            return color;
+        }
     }
 }

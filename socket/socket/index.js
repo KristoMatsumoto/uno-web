@@ -31,9 +31,8 @@ function setupWebSocket(server){
                 socket.join(data.room_id);
                 io.to(data.room_id).emit('player_reconnect', data);
 
-                if (games[data.room_id]){
+                if (games[data.room_id])
                     io.to(data.room_id).emit('game_start', games[data.room_id].get_data());
-                }
             } else {
                 players[data.room_id][data.player_number] = { 
                     id: socket.id,
@@ -50,8 +49,9 @@ function setupWebSocket(server){
         })
     
         socket.on('disconnect', () => {
+            if (!(socket.data && socket.data.room_id && socket.data.player_number)) return;
             // console.log(`A user ${socket.data.nickname} disconnected`);
-            if (!games[socket.data.room_id]){
+            if (!games[socket.data.room_id] && players[socket.data.room_id]){
                 players[socket.data.room_id][socket.data.player_number].timer = setTimeout(() => {
                     socket.leave(socket.data.room_id);
                     // console.log(`Player ${socket.data.nickname} left room ${socket.data.room_id}`);
@@ -65,22 +65,20 @@ function setupWebSocket(server){
                         }
                     })
                     .then(async response => {
-                        if (response.headers.get('content-type').includes('application/json')) {
-                            const data = await response.json();
-                            // console.log('Success:', data);
+                        if (response.ok) {
+                            // console.log('Player removed from database:', socket.data.nickname);
+                            io.to(socket.data.room_id).emit('room_leave', socket.data);
+                            delete players[socket.data.room_id][socket.data.player_number];
                         } else {
                             const errorText = await response.text();
                             // console.error('Error:', errorText);
                         }
                     })
-                    .then(data => {
-                        // console.log('Player removed from database:', socket.data.nickname);
-                        io.to(socket.data.room_id).emit('room_leave', socket.data);
-                        delete players[socket.data.room_id][socket.data.player_number];
-                    })
                     .catch(error => {
-                        // console.error('Error removing player from database:', error);
+                        // console.error('Error while removing player from database:', error);
                     });
+
+                    // добавить проверку удаления комнаты
             }, 10000); }
         });
 
@@ -95,41 +93,58 @@ function setupWebSocket(server){
                 }
             })
             .then(async response => {
-                if (response.headers.get('content-type').includes('application/json')) {
-                    const data = await response.json();
+                if (response.ok) {
+                    games[data.room_id] = new Game(data.room_id, data.settings, players[data.room_id]);
+                    io.to(data.room_id).emit('game_start', games[data.room_id].get_data());
                     // console.log('Success:', data);
                 } else {
                     const errorText = await response.text();
                     // console.error('Error:', errorText.slice(1, 300), "\n\n", errorText.slice(5000, 8000));
                 }
             })
-            .then(ansdata => {
-                games[data.room_id] = new Game(data.room_id, data.settings, players[data.room_id]);
-                io.to(data.room_id).emit('game_start', games[data.room_id].get_data());
-            })
             .catch(error => {
-                // console.error('Error game starting:', error);
+                // console.error('Error while game starting:', error);
                 io.to(data.room_id).emit('game_start_error', error);
             });
         });
 
         socket.on('putting_card', (data) => {
-            // console.log(`Player number ${data.player_number} put card ${data.card}`);
+            console.log(`Player number ${data.player_number} put card `, data.card);
             const game = games[data.room_id];
-            if (game.is_card_useable(new Card(data.card.id, data.card.value, data.card.color))) {
-                game.put_card(data.player_number, data.card.id);
-                io.to(data.room_id).emit('player_put_card', {
-                    player_number: data.player_number, 
-                    card_id: data.card.id
-                });
-                io.to(data.room_id).emit('updated_cards_useability', game.get_cards_info());
-                io.to(data.room_id).emit('update_current_turn', { player_number: game.current_player_number() });
-            }
+            const statuses = game.put_card(data.player_number, data.card.id);
+            if (statuses.find(status => status === Game.STATUS.FAILED)) return;
+            const info_object = statuses.pop();
+            console.log(info_object, "\n");
+            if (statuses.find(status => status === Game.STATUS.GIVED_CARDS))
+                io.to(data.room_id).emit('players_draw_cards', info_object.give_cards);
+            if (statuses.find(status => status === Game.STATUS.CHECK_ON_COLOR_SELECTION))
+                io.to(data.room_id).emit('check_on_color_selection', info_object.player_select);
+            io.to(data.room_id).emit('player_put_card', {
+                player_number: data.player_number, 
+                card_id: data.card.id
+            });
+            io.to(data.room_id).emit('updated_cards_useability', game.get_cards_info());
+            io.to(data.room_id).emit('update_current_turn', { player_number: game.current_player_number() });
         });
+
+        socket.on('color_selected', (data) => {
+            console.log(`Player number ${data.player_number} select color`, data.color);
+            const game = games[data.room_id];
+            const statuses = game.select_color(data.player_number, data.color);
+            if (statuses.find(status => status === Game.STATUS.FAILED)) return;
+            const info_object = statuses.pop();
+            console.log(info_object, "\n");
+            if (statuses.find(status => status === Game.STATUS.GIVED_CARDS))
+                io.to(data.room_id).emit('players_draw_cards', info_object.give_cards);
+            io.to(data.room_id).emit('player_select_color', data.color);
+            io.to(data.room_id).emit('updated_cards_useability', game.get_cards_info());
+            io.to(data.room_id).emit('update_current_turn', { player_number: game.current_player_number() });
+        })
 
         socket.on('draw_card', (data) => {
             const card = games[data.room_id].draw_card(data.player_number);
-            io.to(data.room_id).emit('player_draw_card', { player_number: data.player_number, card: card.get_data() })
+            // console.log(card, "\n");
+            io.to(data.room_id).emit('players_draw_cards', [{ player_number: data.player_number, cards: [ card ] }]);
         });
     });
 }
