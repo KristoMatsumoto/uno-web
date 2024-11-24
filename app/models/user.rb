@@ -26,7 +26,7 @@ class User < ApplicationRecord
   private 
 
   def downcase_login
-    self.login.downcase!
+    self.login&.downcase!
   end
 
   def login_complexity

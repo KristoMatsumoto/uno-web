@@ -2,32 +2,36 @@
 @import 'style';
 @import 'mixins';
 
-.form-background {
-    @extend %doubled-container-back;
+.form-background { 
+    @extend %doubled-container-back; 
+    @media only screen and (max-width: 500px) {
+        margin: 0;
+        padding: 0;
+    }
 }
 .form-container {
     padding: 20px 20px 0;
+    width: 400px;
     @extend %doubled-container-front;
+    @media only screen and (max-width: 500px) { 
+        border-width: 0 !important; 
+        min-width: 0;
+    }
 
-    *{
-        border-radius: 10px;
-    }
+    * { border-radius: 10px; }
     > *,
-    > form > * {
-        margin-bottom: 20px;
-    }
-    form {
-        margin: 0;
-    }
+    > form > * { margin-bottom: 20px; }
+    form { margin: 0; }
     hr {
         @extend %form-borders;
         border-width: 2.5px !important;
     }
-    label{
+    .main-label { font-size: 2rem; }
+    label {
         display: block;
-        font-size: 1.5rem;
+        font-size: 1rem;
     }
-    input, button{
+    input, button {
         padding: 5px;
         outline: none;
         border-style: solid;
@@ -38,80 +42,56 @@
     // input:is(:-webkit-autofill, :autofill){
     //     background-color: $input-background !important;
     // }
-    input:not([type="submit" i]){
+    input:not([type="submit" i]) {
         width: calc(100% - 20px);
-        font-size: 2rem;
+        font-size: 1.5rem;
         background-color: $input-background;
         border: solid 5px $input-background;        
     }
-    input:not([type="submit" i]):hover{
+    input:not([type="submit" i]):hover {
         background-color: $form-background;
         border-color: $input-background;
     }
-    input:not([type="submit" i]):focus{
+    input:not([type="submit" i]):focus {
         background-color: $input-background;
         border-color: $input-border;
     }
-    .error input:not([type="submit" i]){
+    .error input:not([type="submit" i]) {
         background-image: image-url('warning.svg');
         background-repeat: no-repeat;
         background-size: 3rem;
         background-position: right center;
         border-color: $error !important;
     }
-    .message{
+    .message {
         margin: 5px 0 0;
         color: $error;
     }
 
-    .selection-option{
+    .selection-option {
         border-width: 5px;
         width: calc(100% - 20px);
-        font-size: 2rem;
+        font-size: 1.5rem;
         background-color: $form-background;
         color: $form-color;
         text-align: center;
         border-color: $form-background;
     }
-    .selection-option:hover{
+    .selection-option:hover {
         background-color: $form-background;
         border-color: $input-background;
     }
-    .selection-option:active{
+    .selection-option:active {
         background-color: $input-background;
         border-color: $input-background;
     }
-    .pare-container input:not([type="submit" i]){
-        // max-width: 5rem;
-        width: 5rem;
-    }
-
+    .pare-container input:not([type="submit" i]) { width: 5rem; }
 }
 
-@media only screen and (max-width: 500px){
-    .form-background{
-        margin: 0;
-        padding: 0;
-    }
-    .form-container{
-        border-width: 0 !important;
-    }
-}
-.play-button{
-    @include big-button($button-success);
-}
-.play-button:hover{
-    @include big-button--hover($button-success);
-}
-.play-button:active{
-    @include big-button--active($button-success);
-}
-.dangerous-button{
-    @include big-button($button-dangerous);
-}
-.dangerous-button:hover{
-    @include big-button--hover($button-dangerous);
-}
-.dangerous-button:active{
-    @include big-button--active($button-dangerous);
-}
+.play-button { @include big-button($button-success); }
+.play-button:hover { @include big-button--hover($button-success); }
+.play-button:active { @include big-button--active($button-success); }
+
+.dangerous-button { @include big-button($button-dangerous); }
+.dangerous-button:hover { @include big-button--hover($button-dangerous); }
+.dangerous-button:active { @include big-button--active($button-dangerous); }

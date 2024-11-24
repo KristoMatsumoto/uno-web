@@ -1,0 +1,5 @@
+<% if model.errors[parametr].any? %> 
+    <% model.errors.full_messages_for(parametr).each do | message | %> 
+        <p class="message"><%= message %></p>  
+    <% end %> 
+<% end %>

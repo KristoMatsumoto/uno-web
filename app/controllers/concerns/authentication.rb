@@ -72,6 +72,6 @@ module Authentication
       user_signed_in? || guest_signed_in?
     end
 
-    helper_method :current_user, :current_guest, :user_signed_in?, :guest_signed_in?, :signed_in?
+    helper_method :current_user, :current_guest, :current_player, :user_signed_in?, :guest_signed_in?, :signed_in?
   end
 end

@@ -36,7 +36,7 @@ class RoomsController < ApplicationController
     @player.leave_room
     if (@room)
       if (@room.game_start? && @player.room_player.room != @room)
-        flash[:warning] = "There's already a game going on in this room"
+        @room.errors.add(:code, "leads to the room that has already started the game") 
         render :new, status: :unprocessable_entity
       else 
         if (@room.room_players.create(player: @player))
@@ -47,7 +47,8 @@ class RoomsController < ApplicationController
         end
       end
     else
-      flash[:error] = "Room not found, please check the code again"
+      @room ||= Room.new
+      @room.errors.add(:code, "doesn't exist")
       render :new, status: :unprocessable_entity
     end
   end

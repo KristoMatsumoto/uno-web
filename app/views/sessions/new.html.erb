@@ -1,0 +1,21 @@
+<div class='form-page'>
+    <div class='form-background'><div class='form-container'>
+        <div class='main-label'>LOG IN</div>
+        <%= form_with model: @user, url: sessions_path, method: :post do | form | %>
+            <div>
+                <%= form.label "Login" %>
+                <%= form.text_field :login, placeholder: 'Enter login' %>
+            </div>
+            <div>
+                <%= form.label "Password" %>
+                <%= form.password_field :password, placeholder: 'Enter password' %>
+            </div>
+            <div class='pare-container'>
+                <%= form.submit 'LOG IN', class: 'play-button' %>
+            </div>
+        <% end %>
+        <hr>
+        <%= button_to new_user_path, method: :get, class: "selection-option" do %>Create account<% end %>
+        <%= button_to new_room_path, method: :get, class: "selection-option" do %>Play without account<% end %>
+    </div></div>
+</div>

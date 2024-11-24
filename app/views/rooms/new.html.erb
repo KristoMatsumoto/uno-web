@@ -8,14 +8,13 @@
                 <%= form.label "Nickname" %>
                 <%= form.text_field :nickname, placeholder: 'Enter nickname', value: @player&.nickname %>
             </div>
-            <div class='<% if (flash[:error] || flash[:warning]) %>error<% end %>'>
+            <div class='<% if @room.errors[:code].present? %>error<% end %>'>
                 <%= form.label "Room code" %>
                 <div class='pare-container'>
                     <%= form.text_field :code, placeholder: 'Code', value: params.dig(:room_player, :code) %>
                     <%= form.submit 'PLAY', class: 'play-button' %>
                 </div>
-                
-                <p class='message'><%= flash[:error] %></p><p class='message'><%= flash[:warning] %></p>
+                <%= render 'shared/error', model: @room, parametr: :code %>
             </div>
             <button type='button' class='selection-option', id="create-room-button">CREATE NEW ROOM</button>
         <% end %>
@@ -25,23 +24,20 @@
             <div>
                 <%= form.label "Nickname"%>
                 <%= form.text_field :nickname, placeholder: 'Enter nickname', value: @player&.nickname %>
-                <p class='message'><%= flash[:error] %></p><p class='message'><%= flash[:warning] %></p>
             </div>
-            <div class='<% if (flash[:error] || flash[:warning]) %>error<% end %>'>
-
+            <div>
                 <div class='pare-container'>
                     <%= form.submit 'PLAY', class: 'play-button' %>
                 </div>
-                
             </div>
             <button type='button' class='selection-option', id="join-room-button">JOIN OTHER ROOM</button>
         <% end %>
         <hr>
         <% if user_signed_in? %>
-            <%= button_to new_user_path, class: "selection-option" do %>Log out<% end %>
+            <%= button_to sessions_path, method: :delete, class: "selection-option" do %>Log out<% end %>
         <% else %>
-            <%= button_to new_user_path, class: "selection-option" do %>Log in<% end %>
-            <%= button_to new_user_path, class: "selection-option" do %>Create account <% end %>
+            <%= button_to new_sessions_path, method: :get, class: "selection-option" do %>Log in<% end %>
+            <%= button_to new_user_path, method: :get, class: "selection-option" do %>Create account<% end %>
         <% end %>
     </div></div>
 </div>
