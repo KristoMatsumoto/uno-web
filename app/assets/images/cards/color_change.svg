@@ -1,0 +1,45 @@
+<svg width="200" height="300" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="300" rx="20" fill="#E1E1E1"/>
+    <mask id="mask0_156_597" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="10" y="10" width="180" height="280">
+        <rect x="10" y="10" width="180" height="280" rx="10" fill="#141414"/>
+    </mask>
+    <g mask="url(#mask0_156_597)">
+        <rect x="10" y="10" width="180" height="280" rx="10" fill="#141414"/>
+        <mask id="mask1_156_597" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="39" width="191" height="222">
+            <ellipse cx="99.8489" cy="150.276" rx="75" ry="125" transform="rotate(35.7 99.8489 150.276)" fill="#E1E1E1"/>
+        </mask>
+        <g mask="url(#mask1_156_597)">
+            <rect x="78.7773" y="1.86511" width="143.092" height="150" transform="rotate(-7.61747 78.7773 1.86511)" fill="#EDCD2C"/>
+            <rect x="-20.3403" y="15.121" width="100" height="150" transform="rotate(-7.61747 -20.3403 15.121)" fill="#3F911E"/>
+            <rect x="63.1183" y="-25" width="100" height="150" transform="rotate(22.3825 63.1183 -25)" fill="#3F911E"/>
+            <rect x="99.355" y="149.735" width="100" height="150" transform="rotate(-7.61747 99.355 149.735)" fill="#C9271D"/>
+            <rect y="163.256" width="100" height="150" transform="rotate(-7.61747 0 163.256)" fill="#1D59AC"/>
+            <rect x="99.1641" y="149.829" width="100" height="150" transform="rotate(22.3825 99.1641 149.829)" fill="#C9271D"/>
+        </g>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M160.754 194.038C201.036 137.973 206.42 72.9303 172.781 48.7615C139.142 24.5927 79.2171 50.45 38.9358 106.515C-1.34551 162.581 -6.72998 227.623 26.9092 251.792C60.5485 275.961 120.473 250.104 160.754 194.038ZM156.694 191.121C195.364 137.298 201.26 75.3796 169.863 52.8221C138.467 30.2645 81.6665 55.61 42.9964 109.433C4.32636 163.256 -1.56994 225.174 29.8267 247.732C61.2233 270.289 118.024 244.944 156.694 191.121Z" fill="#E1E1E1"/>
+        <mask id="mask2_156_597" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="15" y="14" width="33" height="40">
+            <ellipse cx="31.4335" cy="33.9999" rx="12.9064" ry="21.5107" transform="rotate(35.7 31.4335 33.9999)" fill="#E1E1E1"/>
+        </mask>
+        <g mask="url(#mask2_156_597)">
+            <rect x="27.8074" y="8.46051" width="24.624" height="25.8128" transform="rotate(-7.61747 27.8074 8.46051)" fill="#EDCD2C"/>
+            <rect x="10.7506" y="10.7417" width="17.2085" height="25.8128" transform="rotate(-7.61747 10.7506 10.7417)" fill="#3F911E"/>
+            <rect x="25.1127" y="3.8374" width="17.2085" height="25.8128" transform="rotate(22.3825 25.1127 3.8374)" fill="#3F911E"/>
+            <rect x="31.3485" y="33.9067" width="17.2085" height="25.8128" transform="rotate(-7.61747 31.3485 33.9067)" fill="#C9271D"/>
+            <rect x="14.251" y="36.2335" width="17.2085" height="25.8128" transform="rotate(-7.61747 14.251 36.2335)" fill="#1D59AC"/>
+            <rect x="31.3157" y="33.923" width="17.2085" height="25.8128" transform="rotate(22.3825 31.3157 33.923)" fill="#C9271D"/>
+        </g>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M41.9144 41.5307C48.8462 31.8827 49.7728 20.6898 43.984 16.5307C38.1952 12.3716 27.8831 16.8213 20.9513 26.4693C14.0194 36.1173 13.0929 47.3102 18.8817 51.4693C24.6705 55.6284 34.9826 51.1787 41.9144 41.5307ZM41.2156 41.0287C47.8702 31.7666 48.8848 21.1113 43.4819 17.2295C38.0791 13.3477 28.3046 17.7092 21.65 26.9713C14.9955 36.2334 13.9808 46.8887 19.3837 50.7705C24.7866 54.6523 34.5611 50.2908 41.2156 41.0287Z" fill="#E1E1E1"/>
+        <mask id="mask3_156_597" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="152" y="246" width="33" height="40">
+            <ellipse cx="168.633" cy="266" rx="12.9064" ry="21.5107" transform="rotate(35.7 168.633 266)" fill="#E1E1E1"/>
+        </mask>
+        <g mask="url(#mask3_156_597)">
+            <rect x="165.007" y="240.461" width="24.624" height="25.8128" transform="rotate(-7.61747 165.007 240.461)" fill="#EDCD2C"/>
+            <rect x="147.95" y="242.742" width="17.2085" height="25.8128" transform="rotate(-7.61747 147.95 242.742)" fill="#3F911E"/>
+            <rect x="162.313" y="235.837" width="17.2085" height="25.8128" transform="rotate(22.3825 162.313 235.837)" fill="#3F911E"/>
+            <rect x="168.548" y="265.907" width="17.2085" height="25.8128" transform="rotate(-7.61747 168.548 265.907)" fill="#C9271D"/>
+            <rect x="151.451" y="268.234" width="17.2085" height="25.8128" transform="rotate(-7.61747 151.451 268.234)" fill="#1D59AC"/>
+            <rect x="168.516" y="265.923" width="17.2085" height="25.8128" transform="rotate(22.3825 168.516 265.923)" fill="#C9271D"/>
+        </g>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M179.114 273.531C186.046 263.883 186.973 252.69 181.184 248.531C175.395 244.372 165.083 248.821 158.151 258.469C151.219 268.117 150.293 279.31 156.082 283.469C161.87 287.628 172.182 283.179 179.114 273.531ZM178.415 273.029C185.07 263.767 186.085 253.111 180.682 249.229C175.279 245.348 165.504 249.709 158.85 258.971C152.195 268.233 151.181 278.889 156.583 282.771C161.986 286.652 171.761 282.291 178.415 273.029Z" fill="#E1E1E1"/>
+    </g>
+</svg>

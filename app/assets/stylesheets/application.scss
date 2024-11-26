@@ -4,7 +4,7 @@
 @import '_form';
 @import '_room';
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: content-box;
@@ -12,12 +12,8 @@
     font-size: $font-size;
     text-decoration: none;
 }
-body{
-    @extend %background_with_image;
-}
-.hidden{
-    display: none;
-}
+body { @extend %background_with_image; }
+.hidden, .admin-hidden { display: none; }
 
 @media only screen and (max-width: 500px) {
     * { font-size: $font-size-mini; }
