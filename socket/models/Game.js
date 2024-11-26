@@ -9,7 +9,7 @@ class Game {
         SUCCESS: 'success',
         GIVED_CARDS: 'gived cards',
         CHECK_ON_COLOR_SELECTION: 'check color selection',
-        PLAYER_FINISHED: 'player finished game',
+        PLAYERS_FINISHED: 'players finished game',
         GAME_OVER: 'game over',
 
         FAILED: 'failed'
@@ -53,7 +53,7 @@ class Game {
 
     static push_statuses(statuses, add_info) {
         let info_object = { ...statuses.pop(), ...add_info.pop() };
-        statuses.push(add_info);
+        statuses.push(...add_info);
         statuses.push(info_object);
         return statuses;
     }
@@ -99,7 +99,7 @@ class Game {
         }
     }
 
-    set_player(player){ this.players.push(new Player(player)); }
+    set_player(player) { this.players.push(new Player(player)); }
     set_useability() {
         this.players.forEach(player => {
             player.cards.forEach(card => this.is_card_useable(card));
@@ -108,10 +108,10 @@ class Game {
 
     change_turn_direction() { this.#turn = -this.#turn; }
     get_next_player() {
-        let nex_player_i = this.current_player + this.#turn;
-        if (nex_player_i > this.rules.players_count - 1) nex_player_i = 0; 
-        else if (nex_player_i < 0) nex_player_i = this.rules.players_count - 1; 
-        return nex_player_i;
+        let next_player_i = this.current_player + this.#turn;
+        if (next_player_i > this.rules.players_count - 1) next_player_i = 0; 
+        else if (next_player_i < 0) next_player_i = this.rules.players_count - 1; 
+        return next_player_i;
     }
     is_next_turn() {
         const card_on_drop = this.dropping[this.dropping.length - 1];
@@ -119,12 +119,16 @@ class Game {
         // добавить логику, в зависимости от правил давать ли возможность выложить больше одной карты за ход
         return true;
     }
-    next_turn() { 
-        const player_i = this.get_next_player();
-        if (player_i == undefined) return [ Game.STATUS.FAILED ]; // ONLY == because player_i == undefined TRUE where player_i = undefined || null
-        this.current_player = player_i; 
-
+    next_turn() {
+        let player_i; 
         const statuses = [ Game.STATUS.SUCCESS, {} ];
+        if (this.check_on_color_selection) return statuses
+
+        // ONLY == because player_i == undefined TRUE where player_i = undefined || null
+        while (player_i == undefined || this.players[player_i].is_finished) {
+            player_i = this.get_next_player();
+            this.current_player = player_i;
+        }
         if (this.cards_to_draw !== 0) {
             if (this.is_player_can_hit_card(player_i, this.dropping[this.dropping.length - 1])) {
                 // ...
@@ -132,7 +136,7 @@ class Game {
             } else {
                 Game.push_statuses(statuses, [ 
                     Game.STATUS.GIVED_CARDS, 
-                    { give_cards: this.give_cards_for(this.players[this.current_player], this.cards_to_draw) }
+                    { give_cards: [ this.give_cards_for(this.players[this.current_player], this.cards_to_draw) ] }
                 ]);
                 this.cards_to_draw = 0; 
                 if (this.rules.skip_after_draw_cards) { Game.push_statuses(statuses, this.next_turn()); }
@@ -168,7 +172,24 @@ class Game {
             return false;
         }
     }
-    
+    check_game_finishing() {
+        const statuses = [];
+        const info = { players_finished: [] };
+        let counter = 0;
+        this.players.forEach((player) => {
+            if (player.is_finished) counter += 1;
+            else if (player.cards.length === 0) {
+                counter += 1;
+                player.finish();
+                statuses.push(Game.STATUS.PLAYERS_FINISHED);
+                info.players_finished.push(player.player_number);
+            }
+        });
+
+        if (this.players.length === counter + 1) statuses.push(Game.STATUS.GAME_OVER);
+        statuses.push(info);
+        return statuses;
+    }
     put_card(player_number, card_id) {
         const player = this.players.find(player => player.player_number === player_number);
         let card = player.cards.find(card => card.id === card_id);
@@ -204,6 +225,7 @@ class Game {
                 break;
         }
         this.set_useability();
+        Game.push_statuses(statuses, this.check_game_finishing());
         if (this.is_next_turn()) { Game.push_statuses(statuses, this.next_turn()); }
         return statuses;
     }
@@ -237,16 +259,21 @@ class Game {
             return [ Game.STATUS.FAILED, {} ];
         this.check_on_color_selection = false;
         this.color_selection_player = null;
+        this.set_useability();
         return this.next_turn();
     }
     // can put card?
     // can draw card?
 
+    get_score() {
+        const scores = [];
+        this.players.forEach((player) => { scores.push({ player_number: player.player_number, score: 0 }) });
+        return scores;
+    }
     get_cards_info() {
+        this.players.forEach((player) => console.log(player.nickname, ": ", player.player_number)); console.log("\n");
         const players = [];
-        this.players.forEach((player) => {
-            players.push(player.get_data());
-        })
+        this.players.forEach((player) => { players.push(player.get_data()); })
         return players;
     }
     get_data() {

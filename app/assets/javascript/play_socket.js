@@ -34,16 +34,11 @@ play_socket = () => {
         play_button.disabled = false;
     });
 
-    socket.on('game_end', () => {
-        if (window.socketData.game_start){
-            window.socketData.game_start = false;
+    socket.on('game_end', (data) => {
+        if (window.socketData.game_start) {
             // console.log("Signal end game confirm: ", data);
-            const room_block = document.getElementById('room-form');
-            const canvas_block = document.getElementById('play-desk-block');
-    
-            room_block.classList.remove('hidden');
-            canvas_block.classList.add('hidden'); 
-            window.end_game(); 
+            window.socketData.game_start = false;
+            window.end_game(data); 
         }
     });
 
@@ -53,7 +48,12 @@ play_socket = () => {
         
         const color = game.is_clicking_on_color();
         const card = game.get_selected_card();
-        if (game.is_clicking_on_desk()) {
+        if (game.is_clicking_on_uno()) {
+            socket.emit('clicking_uno', {
+                room_id: game.room_id,
+                player_number: window.socketData.player_number
+            });
+        } else if (game.is_clicking_on_desk()) {
             socket.emit('draw_card', {
                 room_id: game.room_id,
                 player_number: window.socketData.player_number
@@ -78,16 +78,21 @@ play_socket = () => {
         // console.log(`Player put card id${data.card_id}`);
         window.game.put_card(data.player_number, data.card_id);
     });
-    socket.on('player_draw_card', (data) => {
-        // console.log(`Player draw card id${data.card.id}`);
-        window.game.draw_card(data.player_number, data.card);
-    });
     socket.on('players_draw_cards', (data) => {
+        // console.log(data);
         window.game.draw_cards(data);
+    });
+    socket.on('players_finish_game', (data) => {
+        // console.log(data);
+        window.game.finish_game_for(data);
+    });
+    socket.on('player_select_color', (data) => {
+        // console.log("Selected color: ", data);
+        window.game.update_selected_color(data);
     });
 
     socket.on('updated_cards_useability', (data) => {
-        // console.log("Cards useability have been updated", data);
+        console.log("Cards useability have been updated", data);
         window.game.update_cards_useability(data);
     });
     socket.on('update_current_turn', (data) => {
@@ -98,11 +103,7 @@ play_socket = () => {
     socket.on('check_on_color_selection', (data) => {
         // console.log("Check on color selection from player " + data);
         window.game.check_color_selection(data);
-    });
-    socket.on('player_select_color', (data) => {
-        // console.log("Selected color: ", data);
-        window.game.update_selected_color(data);
-    });
+    });    
 }
 
 play_socket();

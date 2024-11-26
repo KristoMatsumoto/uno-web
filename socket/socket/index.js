@@ -155,10 +155,38 @@ function setupWebSocket(server){
             });
         });
 
+        finish_game = (room_id) => {
+            // отослать пинг всем игрокам?
+            fetch(`${process.env.APP_PATH}/rooms/${room_id}/finish`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // 'X-CSRF-Token': socket.data.csrfToken,
+                    // 'Cookie': socket.data.cookie
+                }
+            })
+            .then(async response => {
+                if (response.ok) {
+                    io.to(room_id).emit('game_end', games[room_id].get_score());
+                    delete games[room_id];
+                    // console.log('Success:', data);
+                } else {
+                    const errorText = await response.text();
+                    // console.error('Error:', errorText.slice(1, 300), "\n\n", errorText.slice(5000, 8000));
+                }
+            })
+            .catch(error => {
+                // console.error('Error while game finishing:', error);
+            });
+        }
         check_statuses = (room_id, statuses) => {
             const info_object = statuses.pop();
-            // console.log("Statuses:", statuses, "\nInfo: ", info_object, "\n");
-
+            if (statuses.find(status => status === Game.STATUS.GAME_OVER)) {
+                finish_game(room_id);
+                return;
+            }
+            if (statuses.find(status => status === Game.STATUS.PLAYERS_FINISHED))
+                io.to(room_id).emit('players_finish_game', info_object.players_finished);
             if (statuses.find(status => status === Game.STATUS.GIVED_CARDS))
                 io.to(room_id).emit('players_draw_cards', info_object.give_cards);
             if (statuses.find(status => status === Game.STATUS.CHECK_ON_COLOR_SELECTION))

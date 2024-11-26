@@ -40,4 +40,19 @@ start_game = async (data) => {
 
     window.game = game;
 };
-end_game = () => { window.game = game = null; };
+end_game = (scores) => {
+    const room_block = document.getElementById('room-form');
+    const canvas_block = document.getElementById('play-desk-block');
+    const score_block = document.getElementById('score-block');
+    
+    score_block.classList.remove('hidden');
+    score_block.querySelector('#score').innerHTML =
+        scores.find((score) => score.player_number == game.this_player_number).score;
+    setTimeout(() => {
+        room_block.classList.remove('hidden');
+        score_block.classList.add('hidden'); 
+        canvas_block.classList.add('hidden'); 
+    }, 5000);
+    
+    window.game = game = null; 
+};

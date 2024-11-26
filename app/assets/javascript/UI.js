@@ -370,9 +370,9 @@ class UI {
         this.set_this_player_cards_position();
     }
     update_cards_useability(players) {
-        const player_up = players.find(player => player.player_number = this.this_player_number);
+        const player_up = players.find((player) => player.player_number = this.this_player_number);
         this.players[this.players.length - 1].cards.forEach((card) => {
-            card.useable = player_up.cards.find(card_up => card.id === card_up.id).useable;
+            card.useable = player_up.cards.find((card_up) => card.id === card_up.id).useable;
         });
     }
     update_current_turn(player_number) {
@@ -425,15 +425,22 @@ class UI {
         if (this.this_player_number === player_number) 
             this.draw_color_selection = true;
     }
+    finish_game_for(player_numbers) {
+        player_numbers.forEach((player_number) => {
+            this.player.find((player) => player.player_number === player_number).is_finished = true;
+        });
+    }
 
     // CLICKING CHECK
     is_clicking_on_card() { 
+        if (this.players[this.players.length - 1].is_finished) return null;
         if (this.draw_color_selection) return null;
         const card =  this.get_selected_card();
         if (card.color === 'all') this.draw_color_selection = true;
         return card; 
     }
     is_clicking_on_desk() {
+        if (this.players[this.players.length - 1].is_finished) return false;
         if (this.players[this.players.length - 1].player_number !== this.current_turn) return false;
         const pos_x = (this.canvas_width - this.card_width) / 2 - this.card_width * 2;
         const pos_y = (this.canvas_height - this.card_height) / 2;
@@ -442,6 +449,7 @@ class UI {
             this.client_mouse_y >= pos_y && this.client_mouse_y <= pos_y + this.card_height;
     }
     is_clicking_on_color() {
+        if (this.players[this.players.length - 1].is_finished) return null;
         if (this.draw_color_selection) {
             let color; 
             this.color_selection_position.forEach((color_prop) => {
@@ -454,5 +462,10 @@ class UI {
             });
             return color;
         }
+    }
+    is_clicking_on_uno() {
+        if (this.players[this.players.length - 1].is_finished) return false;
+        // todo
+        return false;
     }
 }

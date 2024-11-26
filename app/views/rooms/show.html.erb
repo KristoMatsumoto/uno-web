@@ -48,7 +48,12 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
 </div>
 
 <div class='form-page <% if !@room.game_start? %>hidden<% end %>' id='play-desk-block'>
-    <canvas id='play-desk'/>
+    <canvas id='play-desk'></canvas>
+    <div class='hidden' id='score-block'>
+        <div class='form-background'>
+            <p id='score'>0</p>
+        </div>
+    </div>
 </div>
 
 <div class='hidden' id='assets-cards'>
