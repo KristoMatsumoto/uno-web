@@ -6,7 +6,7 @@ const players = [];
 const games = [];
 // const roomChannel = require('./room_channel');
 
-function setupWebSocket(server){
+function setupWebSocket(server) {
     const io = new Server(server, {
         cors: {
             origin: "*",
@@ -39,8 +39,6 @@ function setupWebSocket(server){
                     nickname: data.nickname,
                     player_number: data.player_number,
                     is_admin: data.is_admin,
-                    csrfToken: data.csrfToken,
-                    cookie: data.cookie,
                     timer: null 
                 };
                 socket.join(data.room_id);
@@ -58,11 +56,7 @@ function setupWebSocket(server){
 
                     fetch(`${process.env.APP_PATH}/rooms/${socket.data.room_id}/leave/${socket.data.player_number}`, {
                         method: 'DELETE',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'X-CSRF-Token': socket.data.csrfToken,
-                            'Cookie': socket.data.cookie
-                        }
+                        headers: { 'Content-Type': 'application/json' }
                     })
                     .then(async response => {
                         if (response.ok) {
@@ -86,11 +80,7 @@ function setupWebSocket(server){
             if (!data.is_admin) return;
             fetch(`${process.env.APP_PATH}/rooms/${data.room_id}/leave/${data.player_number}`, {
                 method: 'DELETE',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': socket.data.csrfToken,
-                    'Cookie': socket.data.cookie
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(async response => {
                 if (response.ok) {
@@ -109,11 +99,7 @@ function setupWebSocket(server){
             if (!data.is_admin) return;
             fetch(`${process.env.APP_PATH}/rooms/${data.room_id}/get_admin/${data.player_number}`, {
                 method: 'PATCH',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': socket.data.csrfToken,
-                    'Cookie': socket.data.cookie
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(async response => {
                 if (response.ok) {
@@ -130,14 +116,12 @@ function setupWebSocket(server){
         });
 
         socket.on('play_start', (data) => {
+            if (players[data.room_id].length < 2)
+                io.to(data.room_id).emit('game_start_error', 'No enought players to start play');
             // отослать пинг всем игрокам?
             fetch(`${process.env.APP_PATH}/rooms/${socket.data.room_id}/start`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': socket.data.csrfToken,
-                    'Cookie': socket.data.cookie
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(async response => {
                 if (response.ok) {
@@ -159,11 +143,7 @@ function setupWebSocket(server){
             // отослать пинг всем игрокам?
             fetch(`${process.env.APP_PATH}/rooms/${room_id}/finish`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    // 'X-CSRF-Token': socket.data.csrfToken,
-                    // 'Cookie': socket.data.cookie
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(async response => {
                 if (response.ok) {

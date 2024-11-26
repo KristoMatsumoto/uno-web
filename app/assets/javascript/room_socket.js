@@ -34,9 +34,7 @@ room_socket = () => {
             game_start: false,
             nickname: nickname,
             player_number: player_number,
-            is_admin: is_admin,
-            csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            cookie: document.cookie
+            is_admin: is_admin
         }
 
         const socket = io(`${window.location.protocol}//${window.location.hostname}:4000`);

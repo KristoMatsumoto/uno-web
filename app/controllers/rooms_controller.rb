@@ -1,5 +1,4 @@
-class RoomsController < ApplicationController  
-  skip_before_action :verify_authenticity_token, only: [:leave, :start, :finish, :get_admin]
+class RoomsController < ApplicationController
   before_action :set_player, only: [:new, :create, :join, :show]
   before_action :set_player_nickname, only: [:create, :join]
   before_action :is_player_in_room, only: [:show]
