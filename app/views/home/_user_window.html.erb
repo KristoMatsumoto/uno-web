@@ -1,0 +1,9 @@
+<div class='form-background'><div class=''>
+    <% if user_signed_in? %>
+        <%= link_to "Home", user_path(current_user), class: "selection-option" %>
+        <%= button_to sessions_path, method: :delete, class: "selection-option" do %>Log out<% end %>
+    <% else %>
+        <%= button_to new_sessions_path, method: :get, class: "selection-option" do %>Log in<% end %>
+        <%= button_to new_user_path, method: :get, class: "selection-option" do %>Create account<% end %>
+    <% end %>
+</div></div>

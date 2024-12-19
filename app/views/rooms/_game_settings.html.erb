@@ -1,0 +1,7 @@
+<div class='settings-block hidden-block<% if !@player.room_player.is_admin? %> admin-hidden<% end %>'>
+    <%= form_with id: 'settings-form' do | form | %>
+        <% Rules.all.each do | rule | %>
+            <%= render 'setting', form: form, rule: rule %>
+        <% end %>
+    <% end %>
+</div>

@@ -8,11 +8,17 @@
         margin: 0;
         padding: 0;
     }
+
+    > * { @extend %doubled-container-front; }
+    hr {
+        @extend %form-borders;
+        border-width: 2.5px !important;
+    }
 }
 .form-container {
     padding: 20px 20px 0;
     width: 400px;
-    @extend %doubled-container-front;
+    
     @media only screen and (max-width: 500px) { 
         border-width: 0 !important; 
         min-width: 0;
@@ -22,10 +28,6 @@
     > *,
     > form > * { margin-bottom: 20px; }
     form { margin: 0; }
-    hr {
-        @extend %form-borders;
-        border-width: 2.5px !important;
-    }
     .main-label { font-size: 2rem; }
     label {
         display: block;

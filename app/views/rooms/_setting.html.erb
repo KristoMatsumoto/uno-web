@@ -1,0 +1,16 @@
+<div class='setting-block-background'><div class='setting-block'>
+    <div class='block'>
+        <%= image_tag 'icon', class: 'icon' %>
+    </div>
+    <div class='block title'><%= rule.title %></div>
+    <div class='block'><%= rule.description %></div>
+    <div class='block'>
+        <% case rule.option %>
+        <% when 'check_box' %>
+            <label class='checkbox-box'>
+                <%= form.check_box rule.id, value: true %>
+                <span class="slider"></span>
+            </label>
+        <% end %>       
+    </div>
+</div></div>

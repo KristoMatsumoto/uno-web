@@ -5,27 +5,22 @@
 .room-container {
     padding: 0;
     min-width: 90vw;
-    @extend %doubled-container-front;
     @extend %pare-container;
-    @media only screen and (max-width: 500px) {
-        height: calc(100vh - 20px);
+    @media only screen and (max-width: 500px) { 
+        height: calc(100vh - 20px); 
+        flex-direction: column-reverse;
+        border: none;
     }
 
     > * {
         display: flex;
         flex-direction: column;
+        overflow: hidden;
     }
-    > :nth-of-type(3) {
-        display: flex;
-        flex-wrap: nowrap;
-        flex-direction: column;
-        
-        @media only screen and (max-width: 500px) {
-            height: 100vh;
-            align-self: flex-start;
-        }
+    > *:nth-of-type(2) {        
+        @media only screen and (max-width: 500px) { height: calc(6rem + 106px); }
     }
-    .player-info-border{
+    .player-info-border {
         display: flex;
         justify-content: stretch;
         padding: 7px;
@@ -52,7 +47,7 @@
         height: 500px;
         min-width: calc(5vw + 20rem);
         border-radius: 0;
-        border-right: solid 1px $button-border;
+        border-right: solid 1px $form-background;
 
         > * { margin: 0 10px; }
         > *:nth-of-type(1) { margin-top: 10px; }
@@ -62,7 +57,7 @@
         }
     }
     .settings-block { 
-        flex: 1 1 auto;
+        flex: 0 1 auto;
         background-color: $button-border;
         @media only screen and (max-width: 500px) {
             order: 3;
@@ -75,15 +70,22 @@
         overflow: hidden;
         overflow-y: scroll;
         @media only screen and (max-width: 500px) {
-            box-sizing: border-box;
-            height: 100%;
-            transition: height 1.5s ease; 
             border-style: solid;
             border-width: 5px 0;
             border-color: $form-color;
             //     border-bottom: solid 5px $form-color;
             //     border-right: none;;
         }        
+    }
+    #players, .settings-block {
+        @media only screen and (max-width: 500px) {
+            box-sizing: border-box;
+            height: 100%;
+            min-height: 0;
+        }
+    }
+    #players, .settings-block, > *:nth-of-type(2) {
+        @media only screen and (max-width: 500px) { transition: height 1.5s ease; }
     }
     #hidden-button {
         display: none;
@@ -105,12 +107,16 @@
             // padding: 0;
         }
     }
-    .avatar{
+    .avatar {
         @include circle(70px);
         border: solid 5px $avatar-background;
         background-color: $avatar-background;
-    
-        > * {  @include circle(70px); }
+        @media only screen and (max-width: 500px) { @include circle(35px); }
+        
+        > * {  
+            @include circle(70px); 
+            @media only screen and (max-width: 500px) { @include circle(35px); }
+        }
     }
     .room-info {
         display: flex;
@@ -137,13 +143,14 @@
     //     fill: $form-background;
     //     stoke: $form-background;
     // }
+
+    &:hover { background-color: $input-border; }
+    &:active { background-color: $button-color; }
+
+    &.get-admin { @include button-icon('room_admin_icon.png', 30px); }
+    &.remove-from-room { @include button-icon('delete_player_icon.png', 30px); }
+    &.get-admin, &.remove-from-room { @media only screen and (max-width: 500px) { background-size: 20px; } }
 }
-.little-button:hover { background-color: $input-border; }
-.little-button:active { background-color: $button-color; }
-.little-button.get-admin { @include button-icon('room_admin_icon.png', 30px); }
-.little-button.remove-from-room { @include button-icon('delete_player_icon.png', 30px); }
-.little-button.get-admin, 
-.little-button.remove-from-room { @media only screen and (max-width: 500px) { background-size: 20px; } }
 .setting-button-block {
     @extend %flex-container-row;
     width: 3rem;
@@ -153,6 +160,23 @@
     border-radius: 20px;
     transition: flex-grow 1.5s ease;
     
+    &:hover {
+        flex-grow: 1;
+        border-color: $input-background;
+        background-color: $form-background;
+        @media only screen and (max-width: 500px) { flex-grow: 0; }
+    
+        .setting-button { flex-shrink: 0; }
+        p:not(.hidden) { 
+            display: inline-block; 
+            text-overflow: clip; 
+            white-space: nowrap; 
+        }
+        > *:not(.hidden):not(.setting-button) { 
+            @media only screen and (max-width: 500px) { display: none; }
+        }
+    }
+
     p {
         display: none;
         overflow: hidden;
@@ -160,41 +184,19 @@
     }
     .setting-button:not(.hidden) { display: inline-block; }
 }
-.setting-button-block:hover {
-    flex-grow: 1;
-    border-color: $input-background;
-    background-color: $form-background;
-    @media only screen and (max-width: 500px) { flex-grow: 0; }
-
-    .setting-button { flex-shrink: 0; }
-    p:not(.hidden) { 
-        display: inline-block; 
-        text-overflow: clip; 
-        white-space: nowrap; 
-    }
-}
 .setting-button {
     @extend %buttons;
     @extend %center-one-container;
     background-color: #0000;
     width: 3rem;
     height: 3rem;
+
+    &#copy-link { @include button-icon('copy_link_icon.svg', 3rem); }
+    &#copy-code { @include button-icon('copy_code_icon.svg', 3rem); }
+    &#hide-code { @include button-icon('hide_code_icon.svg', 3rem); }
+    &#show-code { @include button-icon('show_code_icon.svg', 3rem); }
 }
-.setting-button#copy-link { @include button-icon('copy_link_icon.svg', 3rem); }
-.setting-button#copy-code { @include button-icon('copy_code_icon.svg', 3rem); }
-.setting-button#hide-code { @include button-icon('hide_code_icon.svg', 3rem); }
-.setting-button#show-code { @include button-icon('show_code_icon.svg', 3rem); }
 
-@media only screen and (max-width: 500px) {
-    .room-container {
-        flex-direction: column-reverse;
-        border: none;
-
-        .avatar, .avatar > *{ @include circle(35px); }
-    }
-
-    .setting-button-block:hover > *:not(.hidden):not(.setting-button) { display: none; }
-}
 
 #code {
     @extend %center-one-container;
@@ -210,8 +212,44 @@
 }
 #code.hide-code .back { visibility: hidden; }
 
-canvas#play-desk{
+canvas#play-desk {
     width: 100%;
     height: 100vh;
     backdrop-filter: blur(5px);
+}
+#uno-button {
+    @extend %buttons;
+    // @include transform(background 3s);
+    position: absolute;
+    bottom: 1vw;
+    right: 1vw;
+    height: 10vh;
+    width: 10vh;
+    border-radius: 10vh;   
+    overflow: hidden;
+    background-color: $avatar-background;
+    color: $form-background;
+    text-shadow: -2px 2px 0 $avatar-background;
+    font-weight: 600;
+    font-size: 1.25rem;
+    &:hover { background-color: $button-dangerous; }
+}
+#score-block { 
+    position: absolute; 
+    text-align: center;
+
+    .form-background > * {
+        padding: 20px 20px 10px;
+        
+        > * { margin-bottom: 10px; }
+    }
+    p { font-size: 1.75rem; }
+    span { 
+        font-weight: 700; 
+        font-size: 2rem;
+    }
+    .ps { 
+        background: $input-background; 
+        border-radius: 5px;
+    }
 }

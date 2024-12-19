@@ -1,22 +1,13 @@
-<div class='center-container'>
-    <div>UNO WEB</div>
-    <% if user_signed_in? %>
-        <%= link_to 'PLAY', new_room_path, class: 'play-button' %>
-    <% else %>
-        <%= link_to 'PLAY', new_room_path, class: 'play-button' %>
-    <% end %>
-    new room | load room with code | search
-</div>
-
-<div class='center-container modes-choose'>
-    <div class='center-container'>
-        TRY NEW EXPERIENCE
-        with different modes or customize your own
+<div class='center-container row'>
+    <div class='center-container col'>
+        <div class='center-container row'>
+            <div>
+                <%= image_tag 'logo' %>
+                <%= link_to 'PLAY', new_room_path, class: 'play-button' %>
+            </div>
+            <div><%= render 'user_window' %></div>
+        </div>
+        <div><%= render 'info' %></div>
     </div>
-    <div class='modes-container'>
-        <div class='mode'>MODE 1</div>
-        <div class='mode'>MODE 2</div>
-        <div class='mode'>MODE 3</div>
-        <div class='mode'>MODE 4</div>
-    </div>
+    <div><%= render 'shop' %></div>
 </div>

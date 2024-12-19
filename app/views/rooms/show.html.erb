@@ -3,16 +3,7 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
 <%= 'data-admin' if @player.room_player.is_admin %>/>
     <div class='form-background'><div class='room-container'>
         <div id='players'>
-            <% @room_players.each do | player | %>
-                <div class='player-info-border<% if player == @player.room_player %> youself<% end %>' data-player-num='<%= player.player_num %>'><div class='player-info'>
-                    <div class='avatar'>
-                        <%= image_tag 'avatar_icon.svg' %>
-                    </div>
-                    <div class='nickname'><%= truncate player.player.nickname, length: 16 %></div>
-                    <button class='little-button get-admin<% if !@player.room_player.is_admin? %> admin-hidden<% end %><% if player == @player.room_player %> hidden<% end %>' onclick='get_admin(<%= player.player_num %>)' ></button>
-                    <button class='little-button remove-from-room<% if !@player.room_player.is_admin? %> admin-hidden<% end %><% if player == @player.room_player %> hidden<% end %>' onclick='remove_player(<%= player.player_num %>)' ></button>
-                </div></div>
-            <% end %>
+            <% @room_players.each do | player | %><%= render 'player', player: player %><% end %>
         </div>
         <button id='hidden-button' onclick='showBlock()'>Show game settings</button>
         <div>
@@ -35,11 +26,8 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
             </div>
             <%= javascript_include_tag "copy_text", 'data-turbo-track': 'reload' %>
             <%= javascript_include_tag "hide_or_show_code", 'data-turbo-track': 'reload' %>
-            <div class='settings-block hidden-block'>
-                <%= form_with do | form | %>
-
-                <% end %>
-            </div>
+            
+            <%= render 'game_settings' %>
             <div class='room-info'>
                 <%= button_to new_room_path, method: :get, class: 'dangerous-button' do %>
                     LEAVE ROOM
@@ -50,37 +38,9 @@ data-room-id='<%= @room.id %>' data-user-name='<%= @player.nickname %>' data-use
     </div></div><%= javascript_include_tag "transition_blocks", 'data-turbo-track': 'reload' %>
 </div>
 
-<div class='form-page <% if !@room.game_start? %>hidden<% end %>' id='play-desk-block'>
-    <canvas id='play-desk'></canvas>
-    <div class='hidden' id='score-block'>
-        <div class='form-background'>
-            <p id='score'>0</p>
-        </div>
-    </div>
-</div>
 
-<div class='hidden' id='assets-cards'>
-    <%= image_tag 'cards/0.svg', id: '0' %>
-    <%= image_tag 'cards/1.svg', id: '1' %>
-    <%= image_tag 'cards/2.svg', id: '2' %>
-    <%= image_tag 'cards/3.svg', id: '3' %>
-    <%= image_tag 'cards/4.svg', id: '4' %>
-    <%= image_tag 'cards/5.svg', id: '5' %>
-    <%= image_tag 'cards/6.svg', id: '6' %>
-    <%= image_tag 'cards/7.svg', id: '7' %>
-    <%= image_tag 'cards/8.svg', id: '8' %>
-    <%= image_tag 'cards/9.svg', id: '9' %>
-    <%= image_tag 'cards/direction.svg', id: 'direction' %>
-    <%= image_tag 'cards/skip.svg', id: 'skip' %>
-    <%= image_tag 'cards/+2.svg', id: '+2' %>
-    
-    <%= image_tag 'cards/+4.svg', id: '+4' %>
-    <%= image_tag 'cards/color_change.svg', id: 'color_change' %>
-
-    <%= image_tag 'cards/back.svg', id: 'back' %>
-    <%= image_tag 'cards/empty.svg', id: 'empty' %>
-    <%# TEXTURES %>
-</div>
+<%= render 'desk' %>
+<%= render 'textures' %>
 
 <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 <%= javascript_include_tag "UI", 'data-turbo-track': 'reload' %>

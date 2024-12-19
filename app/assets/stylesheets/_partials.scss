@@ -14,7 +14,10 @@
 %scroll-bar {
     scrollbar-color: $input-background $button-border;
     scrollbar-width: auto;
-    overflow-y: scroll;
+}
+%body-sizes {
+    width: 100vw;
+    height: 100vh;
 }
 
 // FORM STYLE
@@ -23,12 +26,12 @@
     border-width: 5px;
     border-style: solid;
 }
-%doubled-container-back{
+%doubled-container-back {
     background-color: $form-background;
     padding: 10px;
     border-radius: 25px;
 }
-%doubled-container-front{
+%doubled-container-front {
     @extend %form-borders;
     border-radius: 20px;
     color: $form-color;
@@ -60,9 +63,7 @@
     flex-direction: row;
     justify-items: stretch;
 
-    > * {
-        flex: 1 1 auto;
-    }
+    > * { flex: 1 1 auto; }
 }
 // %center-container{
 //     margin: 0 auto;

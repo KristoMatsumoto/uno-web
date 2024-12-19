@@ -3,12 +3,12 @@
 //     transition-duration: 0.2s;
 //     transition-property: font-size;
 // }
-@mixin circle($size){
+@mixin circle($size) {
     width: $size;
     height: $size;
     border-radius: $size;
 }
-@mixin big-button($main-color){
+@mixin big-button($main-color) {
     text-align: center;
     border-radius: 10px;
     font-size: 1.5rem;
@@ -18,19 +18,25 @@
     background-color: $main-color !important;
     color: $button-color !important;
 }
-@mixin big-button--hover($main-color){
+@mixin big-button--hover($main-color) {
     border-color: $button-border !important;
     background-color: $main-color !important;
     color: $button-border !important;
 }
-@mixin big-button--active($main-color){
+@mixin big-button--active($main-color) {
     border-color: $main-color !important;
     background-color: $button-color !important;
     color: $main-color !important;
 }
-@mixin button-icon($image-url, $size){
+@mixin button-icon($image-url, $size) {
     background-image: image-url($image-url);
     background-size: $size;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+@mixin transform($property) {
+    -webkit-transform: $property;
+    -ms-transform: $property;
+    transform: $property;
 }

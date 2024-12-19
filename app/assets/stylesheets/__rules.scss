@@ -1,0 +1,77 @@
+@import 'style';
+@import 'mixins';
+
+.settings-block form {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    height: calc(430px - 7rem);
+
+    .setting-block-background {
+        padding: 5px;
+        border-radius: 25px;
+        background-color: $container-blocks;
+        height: min-content;
+
+        &:hover { box-shadow: 0 0 6px #0008 }
+    }
+    .setting-block {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 5px;
+        background-color: $container-blocks-color;
+        border-radius: 20px;
+        padding: 5px;
+        max-width: 15rem;
+        // height: min-content;
+        // box-shadow: 0 0 6px #000;
+        @media only screen and (max-width: 500px) { max-width: 10rem; }
+
+        .block { text-align: center; }
+        .block.title { font-size: 1.5rem; }
+        .icon { 
+            width: 7.5rem; 
+            @media only screen and (max-width: 500px) { width: 7.5rem; }
+        }
+    }    
+}
+
+.checkbox-box {
+    position: relative;
+    display: inline-block;
+    width: calc(4rem + 10px);
+    height: calc(2rem + 10px);
+
+    input { display: none; }
+    .slider {
+        border: solid 5px $container-blocks;
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: $button-dangerous;
+        border-radius: calc(1rem + 5px);
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: calc(2rem - 10px);
+        width: calc(2rem - 10px);
+        left: 5px;
+        bottom: 5px;
+        background-color: white;
+        border-radius: 50%;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+    input:checked + .slider { background-color: $button-success; }
+    input:focus + .slider { box-shadow: 0 0 1px $button-success; }
+    input:checked + .slider:before { @include transform(translateX(2rem)); }
+}

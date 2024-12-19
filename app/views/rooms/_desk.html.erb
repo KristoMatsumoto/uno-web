@@ -1,0 +1,7 @@
+<div class='form-page <% if !@room.game_start? %>hidden<% end %>' id='play-desk-block'>
+    <canvas id='play-desk'></canvas>
+    <button type='button' id='uno-button' onclick='say_uno()'>UNO</button>
+    
+
+    <%= render 'score' %>
+</div>
