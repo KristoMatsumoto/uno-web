@@ -2,9 +2,6 @@ const Player = require('./Player');
 const Card = require('./Card');
 
 class Game {
-    // static class Status {
-    //     static
-    // }
     static STATUS = {
         SUCCESS: 'success',
         GIVED_CARDS: 'gived cards',
@@ -18,37 +15,30 @@ class Game {
     #turn = 1;
     desk = [];
     dropping = [];
+    rules = {};
 
     constructor(room, rules, players) {
-        // this.ready = false;
-        rules = {
-            players_count: players.length,
-            start_arm_lenth: 6,
-            skip_after_draw_cards: true,
-            skip_after_draw_card_from_dropping: true,
-        }
         // Проверка что игроков не меньше 2х
         this.room_id = room;
-        this.rules = rules;
 
-        this.desk = this.initialize_deck();
+        this.desk = Game.initialize_deck();
         this.dropping.push(this.desk.pop());
-
+        
         this.players = [];
-        for (let i = 0; i < players.length; i += 1){
-            if (players[i]){
+        for (let i = 0; i < players.length; i += 1) {
+            if (players[i]) {
                 this.set_player(players[i]);
             }
         }
+        this.set_rules(rules);
         this.initialize_player_arm();
         this.set_useability();
         this.current_player = 0;
 
         this.cards_to_draw = 0;
         this.check_on_color_selection = false;
+        this.hit_or_skip = false;
         this.color_selection_player = null;
-        // Раздать карты игрокам
-        // при этом slice? (добавить проверку, хватит ли карт)
     }
 
     static push_statuses(statuses, add_info) {
@@ -63,7 +53,8 @@ class Game {
             [array[i], array[j]] = [array[j], array[i]];
         }
     }
-    initialize_deck() {
+    static to_bool(string_num) { return (string_num === '1'); }
+    static initialize_deck() {
         const desk = [];
         let index = 0;
         
@@ -89,7 +80,15 @@ class Game {
         this.desk = this.dropping.splice(0, this.dropping.length - this.players.length);
         Game.shuffle(this.desk);
     }
-
+    set_rules(data) {
+        this.rules = {
+            players_count: this.players.length,
+            start_arm_lenth: 6,
+        }
+        this.rules.skip_after_draw_cards = Game.to_bool(data.skip_after_draw_cards);
+        this.rules.skip_after_draw_card_from_dropping = Game.to_bool(data.skip_after_draw_card_from_dropping);
+        this.rules.can_hit_skip_turn = Game.to_bool(data.can_hit_skip_turn);
+    }
     initialize_player_arm(){
         // изменить на start_arm_length
         for (let i = 0; i < 6; i++){
@@ -109,8 +108,8 @@ class Game {
     change_turn_direction() { this.#turn = -this.#turn; }
     get_next_player() {
         let next_player_i = this.current_player + this.#turn;
-        if (next_player_i > this.rules.players_count - 1) next_player_i = 0; 
-        else if (next_player_i < 0) next_player_i = this.rules.players_count - 1; 
+        if (next_player_i > this.players.length - 1) next_player_i = 0; 
+        else if (next_player_i < 0) next_player_i = this.players.length - 1; 
         return next_player_i;
     }
     is_next_turn() {
@@ -120,17 +119,17 @@ class Game {
         return true;
     }
     next_turn() {
-        let player_i; 
+        let player_i = this.current_player; 
         const statuses = [ Game.STATUS.SUCCESS, {} ];
         if (this.check_on_color_selection) return statuses
 
-        // ONLY == because player_i == undefined TRUE where player_i = undefined || null
-        while (player_i == undefined || this.players[player_i].is_finished) {
+        do {
             player_i = this.get_next_player();
             this.current_player = player_i;
-        }
+        } while (this.players[player_i].is_finished);
+
         if (this.cards_to_draw !== 0) {
-            if (this.is_player_can_hit_card(player_i, this.dropping[this.dropping.length - 1])) {
+            if (this.is_player_can_hit_card(player_i)) {
                 // ...
         // проверить дать ли карты
             } else {
@@ -146,12 +145,25 @@ class Game {
     }
     current_player_number() { return this.players[this.current_player].player_number; }
 
-    is_player_can_hit_card(player_index, card) {
+    is_player_can_hit_card_with(card) { // todo
+        const card_on_drop = this.dropping[this.dropping.length - 1];
+        if (this.rules.can_hit_skip_turn && card_on_drop.value === Card.CARD_SKIP && card.value === Card.CARD_SKIP) 
+            card.set_useability(true);
+        else 
+            card.set_useability(false);
         // проверять может ли игрок отбить карту
         // false если отключено в правилах
-        return false;
     }
-    is_card_useable(card) {
+    is_player_can_hit_card(player_index) {
+        this.set_useability()
+        let can = false;
+        this.players[player_index].cards.forEach((card) => {
+            this.is_player_can_hit_card_with(card)
+            if (card.useable) can = true;
+        });
+        return can;
+    }
+    is_card_useable(card) { //todo
         const card_on_drop = this.dropping[this.dropping.length - 1];
         if (card_on_drop.color === Card.NONCOLORED) {
             // можно ли класть черные карты поверх черных
@@ -168,7 +180,7 @@ class Game {
             card.set_useability(true);
             return true;
         } else { 
-            card.set_useability(false); 
+            card.set_useability(false);
             return false;
         }
     }
@@ -224,15 +236,16 @@ class Game {
                 this.color_selection_player = player_number;
                 break;
         }
-        this.set_useability();
         Game.push_statuses(statuses, this.check_game_finishing());
+        // this.set_useability();
         if (this.is_next_turn()) { Game.push_statuses(statuses, this.next_turn()); }
         return statuses;
     }
-    give_cards_for(player, count) {
+    give_cards_for(player, count) { //todo
         const given_cards = [];
         for (let i = 0; i < count; i++) {
             if (this.desk.length < 1) this.refresh_desk();
+            if (this.desk.length < 1) return {};
             // добавить условие, если все карты среди игроков
             const card = this.desk.pop();
             this.is_card_useable(card);
@@ -259,21 +272,30 @@ class Game {
             return [ Game.STATUS.FAILED, {} ];
         this.check_on_color_selection = false;
         this.color_selection_player = null;
-        this.set_useability();
+        // this.set_useability();
         return this.next_turn();
+    }
+    say_uno(player_number) { // todo
+        return [ Game.STATUS.SUCCESS, {} ];
+        // Если не его ход, проверить, кому дать карты
+        //      Если нет игроков с 1 картой (т.е. текущий еще не положил в том числе), штраф тому, кто нажал
+        //      Если у другого игрока уже 1 карта, датть ему штраф
+        // Если его ход, сохранить статус и дождаться окончания хода 
+        //      Если карт 0-1, споко, сохраняем пока не станет больше 1 карты
+        // Надо сохранять статус, пока у игрока 1 карта и при этом он говорил уно...
     }
     // can put card?
     // can draw card?
 
-    get_score() {
+    get_score() { // todo
         const scores = [];
         this.players.forEach((player) => { scores.push({ player_number: player.player_number, score: 0 }) });
         return scores;
     }
     get_cards_info() {
-        this.players.forEach((player) => console.log(player.nickname, ": ", player.player_number)); console.log("\n");
+        this.set_useability();
         const players = [];
-        this.players.forEach((player) => { players.push(player.get_data()); })
+        this.players.forEach((player) => { players.push(player.get_data()); });
         return players;
     }
     get_data() {

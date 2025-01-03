@@ -13,23 +13,6 @@ class Room < ApplicationRecord
     end
   end
 
-  def get_next_player_num
-    room_players = self.room_players
-    room_players.count.times do | index |
-      no_index = true
-      room_players.each do | player |
-        if (player.player_num.to_i == index)
-          no_index = false
-          break
-        end
-      end
-      if (no_index)
-        return index
-      end
-    end
-    return room_players.count
-  end
-
   private
 
   def set_code_uppercase

@@ -4,15 +4,14 @@ class UI {
     constructor(width, height, data, ctx){
         // -------------------- MAIN
         this.room_id = data.room_id;
-        this.canvas_width = width;  // добавить resize
+        this.canvas_width = width; 
         this.canvas_height = height;
         this.ctx = ctx;
         
         // -------------------- PLAYERS SETTINGS
         this.this_player_number = window.socketData.player_number;
         this.current_turn = data.current_player;
-        this.current_turn_time = 0;
-        this.current_turn_timer = null;
+        this.set_timer(120);
         const current_player_index = data.players.findIndex(player => this.is_this_player(player));
         this.players = data.players.slice(current_player_index + 1);
         this.players.push(...data.players.slice(0, current_player_index + 1));
@@ -25,7 +24,7 @@ class UI {
         // -------------------- KLIENT SETTINGS
         this.client_mouse_x = null;
         this.client_mouse_y = null;
-        this.avatar_radius = this.canvas_width * 0.02;
+        this.avatar_radius = 0;
         this.canvas_padding = 80//this.canvas_width * 0.01 + this.avatar_radius;
         this.card_width = 80;
         this.card_height = 120; // 1/6 от минимального размера ширины-высоты
@@ -116,6 +115,13 @@ class UI {
             } else { player_cards[i].pos_y = 0; }
         }
     }
+    set_timer(time) {
+        clearInterval(this.current_turn_timer);
+        this.current_turn_time = time;
+        this.current_turn_timer = setInterval(() => {
+            if (this.current_turn_time > 0) this.current_turn_time--;
+        }, 1000);
+    }
     get_this_player_card_size(card) {
         if (
             (card.selected) || 
@@ -124,8 +130,9 @@ class UI {
         else return [this.client_card_width(), this.client_card_height()];
     }
     is_this_player(player) { return player.player_number === this.this_player_number }
+    is_current_player(player) { return player.player_number === this.current_turn }
 
-    async preload_images() {
+    async #preload_cards() {
         this.cards_text = {};
         this.cards_cache = {};
         const cardsPromises = Array.from(document.querySelectorAll('#assets-cards img')).map((card) => {
@@ -151,7 +158,34 @@ class UI {
         });
     
         await Promise.all(cardsPromises);
-        console.log('Все изображения загружены');
+        console.log('Все карты загружены');
+    }
+    async #preload_avatars() {
+        const avatarsPromises = this.players.map((player, i) => {
+            return new Promise((resolve, reject) => {
+                const url = `../assets/${player.avatar}`
+                const image = new Image();
+                image.src = url;
+    
+                image.onload = () => {
+                    this.players[i].avatar_cache = image;
+                    resolve();
+                };
+    
+                image.onerror = (error) => {
+                    console.error(`Ошибка загрузки аватара для игрока ${i}:`, error);
+                    this.players[i].avatar_cache = null;
+                    resolve();
+                };
+            });
+        });
+    
+        await Promise.all(avatarsPromises);
+        console.log('Все аватары загружены');
+    }
+    async preload_images() {
+        await Promise.all([this.#preload_cards(), this.#preload_avatars()]);
+        console.log('Все ресурсы загружены');
     }
     get_colored_card(value, color = 'all') {
         const key = `${value}_${color}`;
@@ -192,15 +226,16 @@ class UI {
         return this.cards_cache[`${card.value}_${card.color}`] || this.cards_cache[`empty_all`];
     }
 
+    // FOR DRAW
     draw_with_ang(x_center, y_center, angle, draw_element) {
         this.ctx.save();
         this.ctx.translate(x_center, y_center);
         this.ctx.rotate(angle);
         draw_element();
         this.ctx.restore();
-    }  
+    }
 
-    draw_dropping() {
+    draw_dropping() { // todo?
         for (let i = 0; i < this.dropping_cache.length; i++){
             this.ctx.drawImage(
                 this.get_card(this.dropping_cache[i]), 
@@ -209,8 +244,7 @@ class UI {
             );
         }
     }
-
-    draw_desk() {
+    draw_desk() { // todo shadow?
         this.ctx.drawImage(
             this.get_card({ value: 'back', color: 'all' }), 
             (this.canvas_width - this.card_width) / 2 - this.card_width * 2, (this.canvas_height - this.card_height) / 2, 
@@ -231,26 +265,35 @@ class UI {
             }
         }
     }
-
-    draw_avatar(player, x, y, timer){
-
+    draw_timer(player, x, y) { // todo color?
         this.ctx.beginPath();
-        if (timer){
-            // добавить таймер
-        }
-        this.ctx.closePath();
-
-
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, this.avatar_radius, 0, 2 * Math.PI, false);
-        if (player.player_number === this.current_turn)
-            this.ctx.fillStyle = 'orange';    // ! изменить на аватар игрока, подгрузка изображения
-        else 
-            this.ctx.fillStyle = 'blue';
+        const startAngle = -0.5 * Math.PI;
+        const endAngle = startAngle - (this.current_turn_time * 2 * Math.PI / 120);
+        this.ctx.moveTo(x, y);
+        this.ctx.arc(x, y, this.avatar_radius + 10, endAngle, startAngle, false);
+        this.ctx.fillStyle = 'orange';
         this.ctx.fill();
         this.ctx.closePath();
     }
-    draw_nickname(player, x, y){
+    draw_avatar(player, x, y) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, this.avatar_radius, 0, 2 * Math.PI, false);
+        this.ctx.clip();
+    
+        if (player.avatar_cache) {
+            const size = this.avatar_radius * 2;
+            const xOffset = x - this.avatar_radius;
+            const yOffset = y - this.avatar_radius;
+            this.ctx.drawImage(player.avatar_cache, xOffset, yOffset, size, size);
+        } else {
+            this.ctx.fillStyle = 'black';
+            this.ctx.fill();
+        }
+    
+        this.ctx.restore();
+    }
+    draw_nickname(player, x, y) { // todo
         this.ctx.beginPath();
         this.ctx.fillStyle = 'red';     // !
         this.ctx.font = '20px Arial';   // !
@@ -258,12 +301,23 @@ class UI {
         this.ctx.fillText(player.nickname, x, y);
         this.ctx.closePath();
     }
-    draw_player_info(player, x, y){
-        this.draw_avatar(player, x, y, false);  // ! изменить условие: если игрок ходит, таймер true
-        this.draw_nickname(player, x, y + this.avatar_radius * 2);
+    draw_uno(x, y) { // todo
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(x, y, this.avatar_radius * 2, 30);
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'red';
+        this.ctx.font = '20px Arial';  
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText("UNO", x + this.avatar_radius, y + 25);
+        this.ctx.closePath();
     }
-    
-    draw_player(player){
+    draw_player_info(player, x, y) {
+        if (this.is_current_player(player)) this.draw_timer(player, x, y);
+        this.draw_avatar(player, x, y);
+        this.draw_nickname(player, x, y + this.avatar_radius * 2);
+        if (player.say_uno) this.draw_uno(x - this.avatar_radius, y + this.avatar_radius * 2 + 20);
+    }
+    draw_player(player) {
         this.draw_with_ang(player.block_x, player.block_y, player.angle, () => {
             if (this.is_this_player(player)){
                 this.draw_with_ang(-this.canvas_width / 4 - this.avatar_radius * 2, this.avatar_radius, -player.angle, () => {
@@ -277,14 +331,11 @@ class UI {
             this.draw_player_cards(player)
         });
     }
-
     draw_players() {
-        for (let i = 0; i < this.players.length; i++) {
+        for (let i = 0; i < this.players.length; i++) 
             this.draw_player(this.players[i]);
-        }
     }
-
-    draw_color_selection_miniblock(pos_x, pos_y, size, color) {
+    draw_color_selection_miniblock(pos_x, pos_y, size, color) { // todo?
         if (
             this.client_mouse_x >= pos_x &&
             this.client_mouse_x <= pos_x + size &&
@@ -297,7 +348,7 @@ class UI {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(pos_x, pos_y, size, size);
     }
-    draw_color_selection_block() {
+    draw_color_selection_block() { // todo?
         const x_center = this.canvas_width / 2;
         const y_center = this.canvas_height / 2;
         const size = this.card_width * 2 + 60;
@@ -308,10 +359,10 @@ class UI {
             this.draw_color_selection_miniblock(color_prop.pos_x, color_prop.pos_y, this.card_width, color_prop.color);
         });
     }
+
     render() {
         this.ctx.save();
         this.ctx.clearRect(0, 0, this.canvas_width, this.canvas_height);
-        this.ctx.beginPath();
         
         if (this.players) this.draw_players();
         this.draw_dropping();
@@ -319,12 +370,7 @@ class UI {
 
         if (this.draw_color_selection) 
             this.draw_color_selection_block();
-        // отрисовать подбор
-        // отрисовать кнопку UNO
 
-        // отрисовать счет?
-
-        this.ctx.closePath();
         this.ctx.restore();
     }
 
@@ -338,9 +384,8 @@ class UI {
     }
 
     update_dropping(last_card) {
-        if (this.dropping_cache.length == this.dropping_cache_max_length){
+        if (this.dropping_cache.length == this.dropping_cache_max_length) 
             this.dropping_cache.shift();
-        }
         this.dropping_cache.push(last_card);
     }
     update_cards_selection() {
@@ -361,16 +406,12 @@ class UI {
             }
         }
 
-        player_cards.forEach((card) => {
-            card.selected = false;
-        });
-        if (index + 1 > 0){
-            player_cards[index].selected = true;
-        }
+        player_cards.forEach((card) => card.selected = false );
+        if (index + 1 > 0) player_cards[index].selected = true;
         this.set_this_player_cards_position();
     }
     update_cards_useability(players) {
-        const player_up = players.find((player) => player.player_number = this.this_player_number);
+        const player_up = players.find((player) => player.player_number == this.this_player_number);
         this.players[this.players.length - 1].cards.forEach((card) => {
             card.useable = player_up.cards.find((card_up) => card.id === card_up.id).useable;
         });
@@ -378,8 +419,7 @@ class UI {
     update_current_turn(player_number) {
         this.current_turn = player_number;
         this.set_this_player_cards_position();
-        // this.current_turn_time = 120;
-        // this.current_turn_timer = setInterval(() => {}, 1000);
+        this.set_timer(120);
     }
     update_selected_color(color) {
         this.draw_color_selection = false;
@@ -394,8 +434,8 @@ class UI {
         this.set_players_block_angle();
         this.set_this_player_cards_position();
         this.set_color_selection_positions();
+        this.avatar_radius = this.canvas_width * 0.03;
     }
-    
     resize(width, height) {
         this.canvas_width = width;
         this.canvas_height = height;
@@ -427,29 +467,46 @@ class UI {
     }
     finish_game_for(player_numbers) {
         player_numbers.forEach((player_number) => {
-            this.player.find((player) => player.player_number === player_number).is_finished = true;
+            this.players.forEach((player) => {
+                if (player.player_number === player_number) player.is_finished = true;
+            });
         });
+    }
+    player_say_uno(player_number) {
+        const player = this.players.find(player => player.player_number === player_number);
+        player.say_uno = true;
+        setTimeout(() => { player.say_uno = false; }, 5000);
     }
 
     // CLICKING CHECK
-    is_clicking_on_card() { 
-        if (this.players[this.players.length - 1].is_finished) return null;
-        if (this.draw_color_selection) return null;
-        const card =  this.get_selected_card();
-        if (card.color === 'all') this.draw_color_selection = true;
-        return card; 
+    checking_is_finished() {
+        return !(this.players[this.players.length - 1].is_finished);
     }
-    is_clicking_on_desk() {
-        if (this.players[this.players.length - 1].is_finished) return false;
-        if (this.players[this.players.length - 1].player_number !== this.current_turn) return false;
+    checking_is_current_turn() {
+        if (!this.checking_is_finished()) return false;
+        return !(this.players[this.players.length - 1].player_number !== this.current_turn);
+    }
+
+    clicking_on_card(func) { 
+        if (!this.checking_is_current_turn()) return false;
+        if (this.draw_color_selection) return false;
+        const card = this.get_selected_card();
+        if (card) {
+            func(card);
+            return true; 
+        } else return false;
+    }
+    clicking_on_desk(func) {
+        if (!this.checking_is_current_turn()) return false;
         const pos_x = (this.canvas_width - this.card_width) / 2 - this.card_width * 2;
         const pos_y = (this.canvas_height - this.card_height) / 2;
-        return this.client_mouse_x && this.client_mouse_y && 
+        if (this.client_mouse_x && this.client_mouse_y && 
             this.client_mouse_x >= pos_x && this.client_mouse_x <= pos_x + this.card_width && 
-            this.client_mouse_y >= pos_y && this.client_mouse_y <= pos_y + this.card_height;
+            this.client_mouse_y >= pos_y && this.client_mouse_y <= pos_y + this.card_height) func();
+        else return false;
     }
-    is_clicking_on_color() {
-        if (this.players[this.players.length - 1].is_finished) return null;
+    clicking_on_color(func) {
+        if (!this.checking_is_current_turn()) return false;
         if (this.draw_color_selection) {
             let color; 
             this.color_selection_position.forEach((color_prop) => {
@@ -460,12 +517,9 @@ class UI {
                     this.client_mouse_y <= color_prop.pos_y + this.card_width
                 ) { color = color_prop.color_name; }
             });
-            return color;
+            func(color);
+            return true;
         }
-    }
-    is_clicking_on_uno() {
-        if (this.players[this.players.length - 1].is_finished) return false;
-        // todo
-        return false;
+        else return false;
     }
 }

@@ -1,7 +1,7 @@
 <div class='player-info-border<% if player == @player.room_player %> youself<% end %>' data-player-num='<%= player.player_num %>'>
     <div class='player-info'>
         <div class='avatar'>
-            <%= image_tag 'avatar_icon.svg' %>
+            <%= image_tag player.player.avatar.url %>
         </div>
         <div class='nickname'><%= truncate player.player.nickname, length: 16 %></div>
         <button class='little-button get-admin<% if !@player.room_player.is_admin? %> admin-hidden<% end %><% if player == @player.room_player %> hidden<% end %>' onclick='get_admin(<%= player.player_num %>)' ></button>

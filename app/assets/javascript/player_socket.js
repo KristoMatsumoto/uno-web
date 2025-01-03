@@ -13,3 +13,11 @@ get_admin = (player_number) => {
         player_number: player_number
     });
 };
+
+say_uno = () => {
+    if (window.game == undefined) return;
+    window.websocket.emit('say_uno', {
+        room_id: window.socketData.room_id,
+        player_number: window.socketData.player_number
+    });
+};

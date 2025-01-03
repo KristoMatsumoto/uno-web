@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :check_no_authenticate, only: [:new, :create]
+  before_action :check_authenticate, only: [:update]
 
   def new
     @user ||= User.new
@@ -19,12 +20,12 @@ class UsersController < ApplicationController
   end
   
   def show
-        
+    @user = User.find(params[:id])
   end
 
-  def edit 
+  # def edit 
         
-  end
+  # end
 
   def update
         

@@ -3,6 +3,8 @@ class User < ApplicationRecord
 
   has_one :room_player, as: :player
   has_many :rooms, through: :room_players
+  has_many :purchased_items
+  has_many :items, through: :purchased_items
   
   attr_accessor :old_password
   has_secure_password validations: false
@@ -21,6 +23,12 @@ class User < ApplicationRecord
   def initialize(attributes = {})
     super
     self.nickname ||= "Player_#{SecureRandom.hex(4)}"
+  end
+
+  def avatar
+    current_purchased_item = purchased_items.joins(:item).find_by(current: true, items: { itemable_type: 'Avatar' })
+    return current_purchased_item.item.itemable if current_purchased_item
+    return Avatar.default
   end
 
   private 

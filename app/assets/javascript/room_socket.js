@@ -5,7 +5,7 @@ render_player_block = (players_list, data) => {
     player_block.innerHTML = 
         `<div class='player-info'>
             <div class='avatar'>
-                <img src='/assets/avatar_icon.svg' alt='avatar icon'>
+                <img src='/assets/${data.avatar}' alt='avatar icon'>
             </div>
             <div class='nickname'>${data.nickname}</div>
             <button class='little-button get-admin${window.socketData.is_admin ? "" : " admin-hidden"}${data.player_number == window.socketData.player_number ? " hidden" : ""}' onclick='get_admin(${data.player_number})'></button>
@@ -20,19 +20,21 @@ remove_player_block = (players_list, player_number) => {
 }
 
 room_socket = () => {
-    const room_block = document.querySelector('[data-room-id][data-user-name][data-user-num]');
+    const room_block = document.querySelector('[data-room-id][data-user-name][data-user-num][data-avatar]');
     if (room_block){
         const players_list = document.querySelector('#players');
     
         const room_id = room_block.getAttribute('data-room-id');
         const nickname = room_block.getAttribute('data-user-name');
         const player_number = room_block.getAttribute('data-user-num');
-        const is_admin = document.querySelector('[data-room-id][data-user-name][data-user-num][data-admin]') ? true : false;
+        const avatar = room_block.getAttribute('data-avatar');
+        const is_admin = document.querySelector('[data-room-id][data-user-name][data-user-num][data-avatar][data-admin]') ? true : false;
 
         const data = {
             room_id: room_id, 
             game_start: false,
             nickname: nickname,
+            avatar: avatar,
             player_number: player_number,
             is_admin: is_admin
         }

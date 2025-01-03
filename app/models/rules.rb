@@ -8,6 +8,8 @@ class Rules
         '', 'check_box'),
       Rule.new('skip_after_draw_cards', "Draw and skip turn", "After player takes cards after +2 and/or +4, he misses his turn", 
         '', 'check_box'),
+      Rule.new('can_hit_skip_turn', "Hit the \"skip turn\" card", "The player who would have been subject to the \"Skip turn\" action can play a card of the same value to avoid missing a turn", 
+        '', 'check_box'),
     ]
   end
 

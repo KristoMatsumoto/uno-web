@@ -11,6 +11,7 @@ class RoomPlayer < ApplicationRecord
   private 
 
   def set_player_number
-    self.player_num = self.room.get_next_player_num if (self.player_num.blank?)
+    max_player_num = RoomPlayer.where(room_id: room_id).maximum(:player_num)
+    self.player_num = max_player_num ? max_player_num + 1 : 0
   end
 end

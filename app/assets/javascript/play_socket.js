@@ -1,3 +1,14 @@
+get_formData = () => {
+    const settings = {};
+    document.querySelectorAll('#settings-form div input').forEach((input) => {
+        if (input.type === 'checkbox') {
+            if (input.checked) settings[input.name] = input.value;
+        } else 
+            settings[input.name] = input.value;
+    });
+    return settings;
+}
+
 play_socket = () => {
     const play_button = document.querySelector('button#start-game');
     const socket = window.websocket;
@@ -9,10 +20,10 @@ play_socket = () => {
         if (window.socketData.is_admin){
             socket.emit('play_start', {
                 room_id: window.socketData.room_id,
-                settings: new FormData(document.querySelector('.settings-block form')),
+                settings: get_formData(),
                 player: window.socketData
             });
-            this.disabled = true;
+            this.disabled = true;            
         }
     });
 
@@ -46,32 +57,28 @@ play_socket = () => {
         const game = window.game;
         if (game == undefined) return;
         
-        const color = game.is_clicking_on_color();
-        const card = game.get_selected_card();
-        if (game.is_clicking_on_uno()) {
-            socket.emit('clicking_uno', {
-                room_id: game.room_id,
-                player_number: window.socketData.player_number
-            });
-        } else if (game.is_clicking_on_desk()) {
+        if (game.clicking_on_desk(() => {
             socket.emit('draw_card', {
                 room_id: game.room_id,
                 player_number: window.socketData.player_number
             });
-        } else if (color) {
+        })) return;
+
+        if (game.clicking_on_color((color) => {
             socket.emit('color_selected', {
                 room_id: game.room_id,
                 player_number: window.socketData.player_number,
                 color: color
             })
-        } else if (card) {
-            // console.log("put card: ", card);
+        })) return;
+        
+        if (game.clicking_on_card((card) => {
             socket.emit('putting_card', { 
                 room_id: game.room_id,
                 card: card,
                 player_number: window.socketData.player_number
             });
-        }
+        })) return;
     });
 
     socket.on('player_put_card', (data) => {
@@ -90,9 +97,13 @@ play_socket = () => {
         // console.log("Selected color: ", data);
         window.game.update_selected_color(data);
     });
+    socket.on('player_say_uno', (data) => {
+        // console.log("Selected color: ", data);
+        window.game.player_say_uno(data);
+    });
 
     socket.on('updated_cards_useability', (data) => {
-        console.log("Cards useability have been updated", data);
+        // console.log("Cards useability have been updated", data);
         window.game.update_cards_useability(data);
     });
     socket.on('update_current_turn', (data) => {

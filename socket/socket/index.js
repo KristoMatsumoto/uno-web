@@ -4,6 +4,7 @@ const Game = require("../models/Game");
 const Card = require("../models/Card");
 const players = [];
 const games = [];
+const game_rules = [];
 // const roomChannel = require('./room_channel');
 
 function setupWebSocket(server) {
@@ -18,6 +19,7 @@ function setupWebSocket(server) {
         // roomChannel(io, socket);
         socket.on('room_join', (data) => {
             socket.data = data;
+            socket.join(data.room_id);
             if (!players[data.room_id]) {
                 players[data.room_id] = [];
             }
@@ -27,31 +29,24 @@ function setupWebSocket(server) {
                 }
                 players[data.room_id][data.player_number].id = socket.id;
                 players[data.room_id][data.player_number].nickname = data.nickname;
+                players[data.room_id][data.player_number].avatar = data.avatar;
                 // console.log(`User ${socket.data.nickname} (${socket.data.player_number}) reconnected to room ${socket.data.room_id}, timer cleared`);
-                socket.join(data.room_id);
+                
                 io.to(data.room_id).emit('player_reconnect', data);
-
                 if (games[data.room_id])
                     io.to(data.room_id).emit('game_start', games[data.room_id].get_data());
             } else {
-                players[data.room_id][data.player_number] = { 
-                    id: socket.id,
-                    nickname: data.nickname,
-                    player_number: data.player_number,
-                    is_admin: data.is_admin,
-                    timer: null 
-                };
-                socket.join(data.room_id);
+                players[data.room_id][data.player_number] = data;
                 io.to(data.room_id).emit('player_join', data);
             }
         })
     
         socket.on('disconnect', () => {
-            if (!(socket.data && socket.data.room_id && socket.data.player_number)) return;
+            socket.leave(socket.data.room_id);
+
             // console.log(`A user ${socket.data.nickname} disconnected`);
             if (!games[socket.data.room_id] && players[socket.data.room_id] && players[socket.data.room_id][socket.data.player_number]){
                 players[socket.data.room_id][socket.data.player_number].timer = setTimeout(() => {
-                    socket.leave(socket.data.room_id);
                     // console.log(`Player ${socket.data.nickname} left room ${socket.data.room_id}`);
 
                     fetch(`${process.env.APP_PATH}/rooms/${socket.data.room_id}/leave/${socket.data.player_number}`, {
@@ -62,7 +57,8 @@ function setupWebSocket(server) {
                         if (response.ok) {
                             // console.log('Player removed from database:', socket.data.nickname);
                             io.to(socket.data.room_id).emit('player_leave', socket.data);
-                            delete players[socket.data.room_id][socket.data.player_number];
+                            players[socket.data.room_id].splice(socket.data.player_number, 1);
+                            // delete players[socket.data.room_id][socket.data.player_number];
                         } else {
                             const errorText = await response.text();
                             // console.error('Error:', errorText);
@@ -86,7 +82,7 @@ function setupWebSocket(server) {
                 if (response.ok) {
                     // console.log('Player', data.player_number, 'removed from database');
                     io.to(data.room_id).emit('player_removed', { player_number: data.player_number } );
-                    delete players[data.room_id][data.player_number];
+                    players[socket.data.room_id].splice(socket.data.player_number, 1);
                 } else {
                     const errorText = await response.text();
                     // console.error('Error:', errorText);
@@ -116,8 +112,11 @@ function setupWebSocket(server) {
         });
 
         socket.on('play_start', (data) => {
-            if (players[data.room_id].length < 2)
+            if (players[data.room_id].length < 2) {
                 io.to(data.room_id).emit('game_start_error', 'No enought players to start play');
+                return;
+            }
+                
             // отослать пинг всем игрокам?
             fetch(`${process.env.APP_PATH}/rooms/${socket.data.room_id}/start`, {
                 method: 'POST',
@@ -140,10 +139,10 @@ function setupWebSocket(server) {
         });
 
         finish_game = (room_id) => {
-            // отослать пинг всем игрокам?
             fetch(`${process.env.APP_PATH}/rooms/${room_id}/finish`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                // body: JSON.stringify(data)
             })
             .then(async response => {
                 if (response.ok) {
@@ -163,7 +162,6 @@ function setupWebSocket(server) {
             const info_object = statuses.pop();
             if (statuses.find(status => status === Game.STATUS.GAME_OVER)) {
                 finish_game(room_id);
-                return;
             }
             if (statuses.find(status => status === Game.STATUS.PLAYERS_FINISHED))
                 io.to(room_id).emit('players_finish_game', info_object.players_finished);
@@ -175,6 +173,7 @@ function setupWebSocket(server) {
             io.to(room_id).emit('updated_cards_useability', games[room_id].get_cards_info());
             io.to(room_id).emit('update_current_turn', { player_number: games[room_id].current_player_number() });
         }
+        
         socket.on('putting_card', (data) => {
             // console.log(`Player number ${data.player_number} put card `, data.card);
             const game = games[data.room_id];
@@ -186,20 +185,44 @@ function setupWebSocket(server) {
             });
             check_statuses(data.room_id, statuses);
         });
-
         socket.on('color_selected', (data) => {
             // console.log(`Player number ${data.player_number} select color`, data.color);
             const statuses = games[data.room_id].select_color(data.player_number, data.color);
             if (statuses.find(status => status === Game.STATUS.FAILED)) return;
             io.to(data.room_id).emit('player_select_color', data.color);
             check_statuses(data.room_id, statuses);
-        })
-
+        });
         socket.on('draw_card', (data) => {
             const card = games[data.room_id].draw_card(data.player_number);
             // console.log(card, "\n");
+            // переделать с выдачей статусов на случай включения правила не больше одной карты за ход и пас
             io.to(data.room_id).emit('players_draw_cards', [{ player_number: data.player_number, cards: [ card ] }]);
         });
+        socket.on('say_uno', (data) => {
+            const statuses = games[data.room_id].say_uno(data.player_number);
+            if (statuses.find(status => status === Game.STATUS.FAILED)) return;
+            io.to(data.room_id).emit('player_say_uno', data.player_number);
+            check_statuses(data.room_id, statuses);
+        });
+        socket.on('end_turn', (data) => {
+            // Только в свой ход 
+            //      Если игрок уже клал карту, можно закончить
+            //      Иначе не реагировать            
+        });
+        // добавить таймер на ход
+        // добавить отображение аватаров
+        // добавить кнопки закончить ход и уно
+        // подсчитывать очки
+        // чистка комнат
+        // генерация ссылок-приглашений
+        // игровые правила
+        //      подключить изменения правил к сокету
+        //      оформление, иконки, кастомные чек-батоны
+        // добавить админ-иконку
+        // добавить анимацию загрузки
+        // Dissolve the room - кнопка распускания комнаты непосредственно админом
+        //      как отослать сигнал остальным, перенаправить на другую страницу?
+        //      использовать один сигнал и на беке, и на фронте, не отправляя ответ с бека?
     });
 }
 

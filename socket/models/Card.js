@@ -50,6 +50,7 @@ class Card {
     get color() { return this.#color; }
     get id() { return this.#id; }
     get selected_color() { return this.#selected_color; }
+    get useable() { return this.#useable; }
     get_data() { return {
             id: this.#id,
             value: this.#value,

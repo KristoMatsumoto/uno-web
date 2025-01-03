@@ -18,6 +18,10 @@ class Guest < ApplicationRecord
     self.session_token ||= SecureRandom.hex(16)
   end
 
+  def avatar
+    return Avatar.default
+  end
+
   private
 
   def set_last_activity
